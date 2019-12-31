@@ -5,27 +5,30 @@
 #' @param path A character vector identifying the path to search for the FSC
 #'   files, defaults to current directory
 #' @param pattern Grep pattern to identify fsc files, defaults to
-#'   \code{"\\d\\d\\d$"} log.chan Character vector of channels to be
-#'   log-transformed (after "alter.names")
+#'   \code{"\\d\\d\\d$"}
+#' @param log.chan Character vector of channels to be log-transformed (after
+#'  "alter.names")
 #' @param alter.names Logical value passed to \code{read.flowSet} to change "-"
-#'   to "." in names
+#'   to "." in names, default value of \code{TRUE}
 #' @param name.keyword Character string for the  FCS keyword used for names,
 #'   default "SAMPLE ID"
 #' @param  phenoData List to serve as the rudiments of the phenoData built from 
 #'   keywords
-#' @param  tfun transformation function to apply to log-transformed values,
-#'   either \ code{asinh} or \code{log10}
+#' @param  tfun Transformation function to apply to log-transformed values,
+#'   either \ code{asinh} (default) or \code{log10}
 #' @param depth Integer indicating bit depth (2^depth), 10 for FACVSCaliber, 24
 #'   for Acurri
-#' @param log.cutoff Values greater than this value force log-transfromation if 
-#'   log.chan is \code{NULL}, defaults to \code{2^depth}
+#' @param log.cutoff Values greater than this value force log-transformation if 
+#'   the argument \code{log.chan} is \code{NULL}, defaults to \code{2^depth}
 #' @param ...	Additional arguments to \code{\link{read.Flowset}}
-#'   
+#'
 #'   
 #' @return
 #' 
 #' Flow Set with transformed and name-adjusted parameters.
 #' 
+#' @import flowCore
+#'
 #' @export
 #' 
 readSet <- function(path = ".", pattern = "\\d\\d\\d$", log.chan = NULL,
@@ -47,14 +50,14 @@ readSet <- function(path = ".", pattern = "\\d\\d\\d$", log.chan = NULL,
 	else
 		stop("unable to find suitable FACS data file with pattern: ", pattern)
 
-	fs <- read.flowSet(path = path,
+	fs <- flowCore::read.flowSet(path = path,
 			pattern = pattern,
 			alter.names = alter.names, 
 			phenoData = phenoData, ...)
-	key.names <- names(keyword(fs[[1]]))
+	key.names <- names(flowCore::keyword(fs[[1]]))
 
 # adjusted selection key to match revision of flowCore ?
-	channels <- colnames(fs[[1]])
+	channels <- flowCore::colnames(fs[[1]])
 
 	if (is.null(log.chan)) { # transform based on value
 		sel <- grep("P\\dRmax", key.names, value = TRUE)
@@ -69,8 +72,8 @@ readSet <- function(path = ".", pattern = "\\d\\d\\d$", log.chan = NULL,
 		log.chan <- channels
 
 	if (length(log.chan) > 0) {
-		tl <- transformList(log.chan, tfun)
-		fs <- transform(fs, tl)
+		tl <- flowCore::transformList(log.chan, tfun)
+		fs <- flowCore::transform(fs, tl)
 	}
 	return(fs)
 }
