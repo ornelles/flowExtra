@@ -12,18 +12,17 @@
 ###
 ## Shift G1 peak without using peakNormalize
 ##
-## fs <- readSet(path) 
 # path <- "C:/Users/Owner/Dropbox/docs/flow/2011 data/2011_0124 rpe1 synch roberta"
-# lg <- linearGate(fs, dx = 0.08)
-# fs2 <- Subset(fs, lg)
+# fs <- readSet(path)
+# fs <- Subset(fs, boundaryFilter("FL2.A"))
+# fs2 <- Subset(fs, linearGate(fs))
 # peaks <- peakFind(fs2)
 # head(peaks)
 # adj <- 200 - peaks[,1]
 # for (i in seq_along(fs2))
 # 	exprs(fs2[[i]])[, "FL2.A"] <- exprs(fs2[[i]])[, "FL2.A"] + adj[i]
-# densityplot(~FL2.A, fs, darg = list(adjust = 0.25), main = "Unadjusted")
-# densityplot(~FL2.A, fs2, darg = list(adjust = 0.25), main = "G1 aligned")
-# 
+# densityplot(~FL2.A, fs, darg = list(adjust = 0.1), main = "Unadjusted", xlim = c(0, 500))
+# densityplot(~FL2.A, fs2, darg = list(adjust = 0.2), main = "G1 aligned", xlim = c(0, 600))
 
 #
 # extract ellipsoid gate parameters from filter result for drawing or calculating
@@ -50,80 +49,6 @@ getGate <- function(f, type=c("actual", "draw")) {
 		return(.fun(f, type))
 	else
 		stop("cannot use argument of class '", class(f), "'")
-}
-# Helper function to extract information from filterResults
-#
-# extract either 'p', 'true' or 'count' filterResult (x)
-# or from flowSet (x) AND gate (gate)
-# return character string if as.percent is TRUE for 'p'
-# return excluded value if excluded is TRUE
-#
-getFres <- function(x, what = c("p", "true", "count", "n", "positive", "negative"),
-	gate, as.percent = FALSE, excluded = FALSE, fmt = "%4.1f%%")
-{
-# allow for several forms of slot information
-	what <- match.arg(what)
-	if (what == "n") what <- "count"
-	if (what == "positive") what <- "true"
-	if (what == "negative") {
-		what <- "true"
-		excluded <- TRUE
-	}
-
-# dispatch based on arguments 'x' and 'gate'
-	if (class(x) %in% c("flowFrame", "flowSet")) {
-		if (missing(gate))
-			stop("'gate' must be provided if 'x' is a flowFrame or flowSet")
-		if (class(gate) %in% c("filterResultList", "logicalFilterResult"))
-			fres <- gate
-		else
-			fres <- filter(x, gate)
-	}
-	else if (class(x) %in% c("filterResultList", "logicalFilterResult")) {
-		fres <- x
-		if (!missing(gate) && is.logical(gate) && gate == TRUE)
-			as.percent <- TRUE
-	}
-	else
-		stop("require filterResult or flowSet + filter object")
-
-# extract summary from filter result
-	junk <- capture.output(ss <- summary(fres), file = NULL) # suppress messages
-
-# process as list or as single object
-	if (is(fres, "list")) {
-		n <- sapply(ss, slot, "count")
-		true <- sapply(ss, slot, "true")
-	}
-	else {
-		n <- slot(ss, "count")
-		true <- slot(ss, "true")
-	}
-
-# use negative population if 'excluded' is TRUE
-	if (excluded == TRUE)
-		true <- n - true
-
-# extract return value
-	if (what == "p" && as.percent) ret <- sprintf(fmt, 100*true/n)
-	else if (what == "p" && !as.percent) ret <- true/n
-	else if (what == "true") ret <- true
-	else if (what == "count") ret <- n
-
-	return(ret)
-}
-#
-# get.p is now a DEPRICATED alias
-# extract "p" values from filter or filter result
-# return character string if as.percent is TRUE
-# return excluded value if excluded is TRUE
-#
-get.p <- function(x, gate, as.percent = FALSE, excluded = FALSE)
-{
-	if (missing(gate))
-		getFres(x = x, what = "p", as.percent = as.percent, excluded = excluded)
-	else
-		getFres(x = x, what = "p", gate = gate, as.percent = as.percent, excluded = excluded)
 }
 #
 # rangeCut - similar to rangeGate but returns rectangleGate at desired cutoff.
