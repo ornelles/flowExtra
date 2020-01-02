@@ -1,4 +1,4 @@
-#' Create Gate from Lattice Panel
+#' Create Arbitrary Gate from Lattice Panel
 #' 
 #' Interact with lattice plot to define a gate
 #' 
@@ -40,7 +40,7 @@
 #' A \code{polygonGate} or \code{ellipsoidGate} object is returned of the  
 #' same dimensions as the active lattice graph.
 #' 
-#' @import flowCore, cluster
+#' @import flowCore cluster
 #'
 #' @export
 #'

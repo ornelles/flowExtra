@@ -2,7 +2,7 @@
 % Please edit documentation in R/pGate.R
 \name{pGate}
 \alias{pGate}
-\title{Create Gate from Lattice Panel}
+\title{Create Arbitrary Gate from Lattice Panel}
 \usage{
 pGate(type = c("arbitrary", "parallel", "convex", "ellipse"),
   vertical = TRUE, horizontal = FALSE, filterId = NULL,
