@@ -8,7 +8,7 @@
 #' in the `"FL2.A"` channel (or the channel
 #' specified by the argument `chan`) in a `flowFrame` or `flowSet`. Areas
 #' of high density are identified by the function defined in `curveFilter`. If 
-#' this is `NULL`, the [`flowStats::curv1Filter()`] function will be used 
+#' this is `NULL`, the [flowStats::curv1Filter()] function will be used 
 #' with optional arguments (`bwFac` or `gridsize`) passed in `...`.
 #' 
 #' Peak searching is limited to 0.5 to 99.5\% quantiles (default) or to the 
@@ -20,11 +20,11 @@
 #' @param x A `flowFrame` or `flowSet` with the parameter named in `chan`
 #' @param curveFilter Optional function that returns a `multipleFilterResult`
 #'   defining the regions of 1-D curvature in `chan`. If `NULL`, the
-#'   [`flowStats::curv1Filter()`] will be used
+#'   [flowStats::curv1Filter()] will be used
 #' @param chan Name of the data to be evaluated in `x`, default of `"FL2.A"`
 #' @param searchFun Optional function to determine the position of each
 #'   peak in defined by the argument `curvFilter`. If `NULL`, the
-#'   [`stats:density()`] function will be used with the bandwith adjusted
+#'   [stats::density()] function will be used with the bandwith adjusted
 #'   by the option `adj = 2`
 #' @param range.search Optional numeric vector of length 2 defining the
 #'   lower and upper limits to accept peaks. If `NULL` the search will be
@@ -33,10 +33,10 @@
 #'   quantiles for valid peak values, default value of 0.5 to 0.95\%
 #'  (`probs = c(0.005, 0.995)`)
 #' @param ... Additional arguments to be passed to
-#'   [`flowStats::curv1Filter()`]
+#'   [flowStats::curv1Filter()]
 #' 
 #' @return
-#' An 1-D or 2-D array with rownames obtained from [`flowCore::identifier()`]
+#' An 1-D or 2-D array with rownames obtained from [flowCore::identifier()]
 #' and column names determined as described above.
 #' 
 #' @import flowCore flowStats

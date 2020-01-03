@@ -12,6 +12,7 @@
 ###
 ## Shift G1 peak without using peakNormalize
 ##
+# flowViz.par.set(theme = trellis.par.get(), reset = TRUE)
 # path <- "C:/Users/Owner/Dropbox/docs/flow/2011 data/2011_0124 rpe1 synch roberta"
 # fs <- readSet(path)
 # fs <- Subset(fs, boundaryFilter("FL2.A"))
@@ -145,100 +146,6 @@ addText <- function(x, y, labels, col = "red", cex = 2/3, adj = 0.5) {
 		trellis.unfocus()
 	}
 }
-
-
-#
-# peakNormalize - transform flowSet to normalize "G1" and "G2" peaks against a reference
-# Arguments
-# 	peaks	2-column matrix of G1 and (optional) G2 peaks, an NA value for G1 leaves
-#			those values unchanged. If not specified, peakFind wll be called to determine
-#			the G1 and G2 peaks
-#	g1.peak	value of rescaled G1 peak
-#	g2.peak	value of rescaled G2 peak, defaults to ratio * g1.peak
-#	ratio	G2 to G1 ratio used if only a G1 peak is found
-#	chan	character vector specify the flow channel to normalize
-#	limits	numeric vector of length 2 specifying limits for the transformed data
-#			if FALSE, the range will be -Inf, +Inf
-#	range.search peaks will be accepted within this range of original data
-#	...		additional arguments to be passed to peakFind (and then to curv1Filter
-# Value
-#	Returns transformed flowsSet
-#
-## TO-DO Add option to scale by linear factor alone - normalize to G1 peak alone
-## as in example above with RPE synchronized data
-
-peakNormalize <- function(fs, peaks = NULL, g1.peak = 200, g2.peak = g1.peak * ratio,
-		chan = "FL2.A", limits = c(0, 1023), range.search = c(50, 500), ratio = 1.90, ...)
-{
-	if (class(fs) != "flowSet") stop("flowSet required")
-
-# extract G1 and G2 peaks if not provided
-
-	if (is.null(peaks)) {
-		cat("\nIdentifying peaks between", range.search[1], "and",
-				range.search[2], "with curv1Filter...\n")
-		peaks <- fsApply(fs, peakFind, chan = chan, range.search = range.search, ...)
-	}
-
-# assume vector of peaks specifies either a vector of G1 peaks or a "single" G1 peak
-
-	if (is.vector(peaks))
-		if (length(peaks) > 1)
-			peaks <- cbind(peaks, NA)
-		else
-			peaks <- cbind(rep(peaks, length(fs)), NA)
-
-# trim peaks to n x 2 matrix
-
-	peaks <- peaks[,1:2]
-
-# adjust any invisible G2 peaks by assuming ratio * G1 value
-
-	missingG2 <- is.na(peaks[,2])
-	peaks[missingG2, 2] <- peaks[missingG2, 1] * ratio
-
-# adjust any invisible G1 peaks by assuming a value of G2 / ratio
-
-	missingG1 <- is.na(peaks[,1])
-	peaks[missingG1, 1] <- peaks[missingG1, 2] / ratio
-
-# set limits on transformed values
-
-	if (is.null(limits) || limits == TRUE)
-		lim <- range(fsApply(fs, function(v) range(exprs(v)[,chan], na.rm=T)), na.rm=T)
-	else if (is.numeric(limits) && length(limits) == 2)
-		lim <- limits
-	else
-		lim <- c(-Inf, Inf)
-
-# create copy of flowSet then change values 'in situ'
-
-	x <- Subset(fs, TRUE)
-
-	sel <- which(!is.na(peaks[,1]))		# act only on non-NA G1 peaks 
-
-	for (i in sel) {
-		v <- exprs(x[[i]])[, chan]
-
-		a <- (g2.peak - g1.peak)/(peaks[i,2] - peaks[i,1])	# scale factor
-		v <- a * v											# scale
-		v <- v + (g1.peak - a * peaks[i,1]) 				# translate
-
-		v[v < lim[1]] <- lim[1]								# trim
-		v[v > lim[2]] <- lim[2]
-
-		exprs(x[[i]])[, chan] <- v
-	}
-	return(x)
-}
-
-# wrapper for densityplot with finer adjustment
-
-dp <- function(..., adj = 0.2) {
-	densityplot(..., darg = list(adj = adj))
-}
-
-
 
 #
 # Use base graphics to generate colorized density plot as for cell cycle

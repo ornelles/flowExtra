@@ -18,7 +18,7 @@ defining the regions of 1-D curvature in \code{chan}. If \code{NULL}, the
 
 \item{searchFun}{Optional function to determine the position of each
 peak in defined by the argument \code{curvFilter}. If \code{NULL}, the
-\code{\link[=stats:density]{stats:density()}} function will be used with the bandwith adjusted
+\code{\link[stats:density]{stats::density()}} function will be used with the bandwith adjusted
 by the option \code{adj = 2}}
 
 \item{range.search}{Optional numeric vector of length 2 defining the
