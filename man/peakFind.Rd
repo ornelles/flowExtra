@@ -5,7 +5,7 @@
 \title{Find G1 and G2 peaks}
 \usage{
 peakFind(x, curveFilter = NULL, chan = "FL2.A", searchFun = NULL,
-  range.search = NULL, probs = c(0.005, 0.995), ...)
+  range.search = NULL, probs = c(0.05, 0.95), ...)
 }
 \arguments{
 \item{x}{A \code{flowFrame} or \code{flowSet} with the parameter named in \code{chan}}
@@ -22,12 +22,13 @@ peak in defined by the argument \code{curvFilter}. If \code{NULL}, the
 by the option \code{adj = 2}}
 
 \item{range.search}{Optional numeric vector of length 2 defining the
-lower and upper limits to accept peaks. If \code{NULL} the search will be
-limited to the values defined by the quantiles specified in \code{probs}}
+lower and upper limits to accept peaks. The default value of \code{NULL}
+limits the search to the range defined by the quantiles specified
+in \code{probs}}
 
 \item{probs}{Numeric vector of length 2 defining the lower and upper
-quantiles for valid peak values, default value of 0.5 to 0.95\%
-(\code{probs = c(0.005, 0.995)})}
+quantiles for valid peak values, the default value of 5 to 95\%
+is specified by the argument \code{probs = c(0.05, 0.95)}}
 
 \item{...}{Additional arguments to be passed to
 \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}}}
@@ -40,16 +41,19 @@ and column names determined as described above.
 Find G1 and G2 (and other) peaks in FL2.A values
 }
 \details{
-This function identifies the probable location of the G1 and G2 peaks
+This function identifies the probable location of the G1 and G2/M peaks
 in the \code{"FL2.A"} channel (or the channel
 specified by the argument \code{chan}) in a \code{flowFrame} or \code{flowSet}. Areas
 of high density are identified by the function defined in \code{curveFilter}. If
 this is \code{NULL}, the \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} function will be used
 with optional arguments (\code{bwFac} or \code{gridsize}) passed in \code{...}.
 
-Peak searching is limited to 0.5 to 99.5\% quantiles (default) or to the
-values specified in \code{probs}. If no more than two peaks are found, they will
-be labeled \code{"G1"} and \code{"G2"}. A single peak will be labeled as \code{"G1"} with
-an \code{NA} for the second peak, labeled as \code{"<G2>"}. If more peaks are found,
-they will be labeled \code{"peak1"}, \code{"peak2"}, \code{"peak3"}, etc.
+By default, peaks are accepted in the range defined by the 5th to 95th
+percentile or to the percentile values specified in \code{probs}. For
+well-behaved data, this can be set \code{c(50, 500)} to exclude apoptotic
+populations and populations greater than G2/M. If no more than two peaks
+are found, they will be labeled \code{"G1"} and \code{"G2"}. A single peak will be
+labeled as \code{"G1"} with an \code{NA} for the second peak, labeled as \code{"<G2>"}.
+If more than two peaks are found, all peaks will be labeled as
+\code{"peak1"}, \code{"peak2"}, \code{"peak3"}, etc.
 }

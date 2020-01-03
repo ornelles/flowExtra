@@ -12,27 +12,31 @@
 #'
 #' The position of the actual peaks is specified in the optional argument
 #' `peaks`. If provided, this can either be a vector of "G1" peak
-#' positions or a matrix of "G1" and "G2" peak positions. A larger matrix
-#' can be accepted, such as one produced with [peakFind()], but only the
-#' first two columns will be used with "G1" and "G2" in the first and second
-#' columns, respectively. Missing values in either "G1" or "G2"
+#' positions or a matrix of "G1" and "G2/M" peak positions. A larger matrix
+#' will be accepted, such as one produced with [peakFind()], but only the
+#' first two columns will be used and treated as "G1" and "G2" positions,
+#' respectively. Missing values in either "G1" or "G2"
 #' will be replaced by a value derived from `ratio`. If the argument `
 #' peaks` is `NULL`, the function [peakFind()] will be called with
 #' arguments `range.search` and `...` to identify the peaks.
 #'
-#' If the `logical` argument `only.G1 = TRUE`, a complete set of "G1"
-#' values must be provided and the data will only be translated to place
-#' the "G1" peak at the selected value.
+#' If the `logical` argument `scale = FALSE`, a complete set of "G1"
+#' values must be provided and the data will not be translated. The values
+#' only will be translated to place the "G1" peak at value specified
+#' in the argument `g1`. Note that this **should not** be set to `TRUE`
+#' for data with bona fide peaks that are not true "G1" or "G2" peaks such
+#' those found in synchronized populations of cells as in the example.
 #'
-#' The transformed values will be trimmed to the range specified by `
-#' limits`, which has a default value of `c(0, 1023)`. The full range of
+#' Transformed values will be trimmed to the range specified by
+#' `limits`, which has a default value of `c(0, 1023)`. The full range of
 #' original values will be used if `limits = NULL` and no trimming will
 #' occur if `limits = FALSE`.
 #'
 #' @param fs A `flowSet` with data to be transfomred in channel in `chan`
 #' @param peaks An optional matrix of "G1" and "G2" peak values *or* a
 #'   vector "G1" values. The default value of `NULL` will use
-#'	 [peakFind()] to identify the peaks
+#'	 [peakFind()] to identify the peaks within the range specified by
+#'   `range.search`
 #' @param g1 Value of the rescaled G1 peak (`200`)
 #' @param g2 Value of the rescaled G2 peak (`ratio * g1`)
 #' @param ratio G2 to G1 ratio, used to scale data and place missing peaks
@@ -45,10 +49,10 @@
 #'   `-Inf` to `+Inf`.
 #' @param range.search A numeric vector of length 2 specifying the range
 #'   of values in the orignal data in which peaks will be accepted. The
-#'   default value of `c(50, 500)` is chosen to ignore apoptotic values and
+#'   default value of `c(50, 500)` is meant to ignore apoptotic values and
 #'   polyploid peaks
-#' @param only.G1 `Logical` value to prevent scaling by only using the
-#'   "G1" peak to anchor the data
+#' @param scale A `logical` value to scale the data such that the "G1" and "G2"
+#'   peaks occur at the values in `g1` and `g2`, respectively. See details
 #' @param ... Additional arguments passed to [peakFind()] and then to
 #'   [flowStats::curv1Filter()]
 #' 
@@ -61,17 +65,20 @@
 #' 
 peakNormalize <- function(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
 		ratio = 1.90, chan = "FL2.A", limits = c(0, 1023),
-		range.search = c(50, 500), only.G1 = FALSE, ...)
+		range.search = c(50, 500), scale = FALSE, ...)
 {
-# accept only 'flowSet'
-	if (class(fs) != "flowSet") stop("flowSet required")
-
+# argument checks accept only 'flowSet'
+	if (class(fs) != "flowSet")
+		stop("flowSet required")
+# check for channel
+	if (!chan %in% colnames(fs))
+		stop('"', chan, '" is not found in ', deparse(substitute(fs)))
 # extract G1 and G2 peaks if not provided in 'peaks'
 	if (is.null(peaks)) {
-		cat("Identifying peaks between ", range.search[1], " and ",
-		range.search[2], "...")
+		cat("Identifying peaks from", range.search[1], "to", range.search[2], "\n")
 		flush.console()
-		peaks <- fsApply(fs, peakFind, chan = chan, range.search = range.search, ...)
+		peaks <- fsApply(fs, flowExtra::peakFind, chan = chan,
+			range.search = range.search, ...)
 	}
 # assume vector of peaks specifies either a vector of G1 peaks or a "single" G1 peak
 	if (is(peaks, "vector"))
@@ -81,7 +88,7 @@ peakNormalize <- function(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
 			peaks <- cbind(rep(peaks, length(fs)), NA)
 	peaks <- peaks[, 1:2] # use first two peaks
 
-# adjust any invisible G1 or G2 peaks
+# adjust any invisible G1 or G2 peaks before possible scaling
 	missingG2 <- is.na(peaks[,2])
 	peaks[missingG2, 2] <- peaks[missingG2, 1] * ratio
 	missingG1 <- is.na(peaks[,1])
@@ -95,22 +102,25 @@ peakNormalize <- function(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
 	else
 		lim <- c(-Inf, Inf)
 
-# create copy of flowSet then change values 'in situ'
+# create copy of flowSet in order to change values 'in situ'
 	x <- Subset(fs, TRUE)
-	sel <- which(!is.na(peaks[,1])) # act only on non-NA G1 peaks
-	for (i in sel) { # scale factor
+# act only on non-NA G1 peaks
+	sel <- which(!is.na(peaks[, 1]))
+# translate and (optionally) scale data
+	for (i in sel) {
 		v <- exprs(x[[i]])[, chan]
-		if (only.G1 == FALSE)
-			a <- (g2 - g1)/(peaks[i,2] - peaks[i,1]) # scale factor
+		if (scale == TRUE)
+			a <- (g2 - g1)/(peaks[i, 2] - peaks[i, 1]) # scale factor
 		else
 			a <- 1
 	# scale
 		v <- a * v
 	# translate
-		v <- v + (g1 - a * peaks[i,1])
+		v <- v + (g1 - a * peaks[i, 1])
 	# trim
-		v[v < lim[1]] <- lim[1]
-		v[v > lim[2]] <- lim[2]
+		v <- pmax(v, lim[1])
+		v <- pmin(v, lim[2])
+	# replace with transformed data
 		exprs(x[[i]])[, chan] <- v
 	}
 	return(x)

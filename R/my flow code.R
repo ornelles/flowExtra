@@ -12,18 +12,19 @@
 ###
 ## Shift G1 peak without using peakNormalize
 ##
+# library(flowExtra)
 # flowViz.par.set(theme = trellis.par.get(), reset = TRUE)
-# path <- "C:/Users/Owner/Dropbox/docs/flow/2011 data/2011_0124 rpe1 synch roberta"
+# dropbox <- if (.Platform$OS.type == "unix") "~/Dropbox" else "~/../Dropbox"
+# path <- file.path(dropbox, "/docs/flow/2011 data/2011_0124 rpe1 synch roberta")
 # fs <- readSet(path)
 # fs <- Subset(fs, boundaryFilter("FL2.A"))
 # fs2 <- Subset(fs, linearGate(fs))
-# peaks <- peakFind(fs2)
-# head(peaks)
-# adj <- 200 - peaks[,1]
-# for (i in seq_along(fs2))
-# 	exprs(fs2[[i]])[, "FL2.A"] <- exprs(fs2[[i]])[, "FL2.A"] + adj[i]
-# densityplot(~FL2.A, fs, darg = list(adjust = 0.1), main = "Unadjusted", xlim = c(0, 500))
-# densityplot(~FL2.A, fs2, darg = list(adjust = 0.2), main = "G1 aligned", xlim = c(0, 600))
+# fs3 <- peakNormalize(fs2, g1 = 170)
+# dnaplot(~FL2.A, fs, main = "Raw data", xlim = c(0, 500))
+# dnaplot(~FL2.A, fs2, main = "Singlets", xlim = c(0, 500))
+# dnaplot(~FL2.A, fs3, main = "Correct G1 aligned", xlim = c(0, 500))
+# fs4 <- peakNormalize(fs2, g1 = 170, scale = TRUE)
+# dnaplot(~FL2.A, fs4, main = "Incorrect use of 'scale = TRUE'", xlim = c(0, 500))
 # 
 #
 # extract ellipsoid gate parameters from filter result for drawing or calculating
@@ -125,8 +126,8 @@ addText <- function(x, y, labels, col = "red", cex = 2/3, adj = 0.5) {
 		}
 	}
 	else {		# x and y better be numeric...
-		xx <- x
-		yy <- y
+		xx <- as.numeric(x)
+		yy <- as.numeric(y)
 	}
 	if (missing(labels))
 		labels <- seq_along(xx)

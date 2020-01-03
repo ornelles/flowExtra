@@ -6,14 +6,15 @@
 \usage{
 peakNormalize(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
   ratio = 1.9, chan = "FL2.A", limits = c(0, 1023),
-  range.search = c(50, 500), only.G1 = FALSE, ...)
+  range.search = c(50, 500), scale = FALSE, ...)
 }
 \arguments{
 \item{fs}{A \code{flowSet} with data to be transfomred in channel in \code{chan}}
 
 \item{peaks}{An optional matrix of "G1" and "G2" peak values \emph{or} a
 vector "G1" values. The default value of \code{NULL} will use
-\code{\link[=peakFind]{peakFind()}} to identify the peaks}
+\code{\link[=peakFind]{peakFind()}} to identify the peaks within the range specified by
+\code{range.search}}
 
 \item{g1}{Value of the rescaled G1 peak (\code{200})}
 
@@ -32,11 +33,11 @@ will the the original limits of the data. If \code{FALSE} the range will be
 
 \item{range.search}{A numeric vector of length 2 specifying the range
 of values in the orignal data in which peaks will be accepted. The
-default value of \code{c(50, 500)} is chosen to ignore apoptotic values and
+default value of \code{c(50, 500)} is meant to ignore apoptotic values and
 polyploid peaks}
 
-\item{only.G1}{\code{Logical} value to prevent scaling by only using the
-"G1" peak to anchor the data}
+\item{scale}{A \code{logical} value to scale the data such that the "G1" and "G2"
+peaks occur at the values in \code{g1} and \code{g2}, respectively. See details}
 
 \item{...}{Additional arguments passed to \code{\link[=peakFind]{peakFind()}} and then to
 \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}}}
@@ -55,18 +56,22 @@ should theoretically be 2.0, it is empirically closer to 1.9.
 
 The position of the actual peaks is specified in the optional argument
 \code{peaks}. If provided, this can either be a vector of "G1" peak
-positions or a matrix of "G1" and "G2" peak positions. A larger matrix
-can be accepted, such as one produced with \code{\link[=peakFind]{peakFind()}}, but only the
-first two columns will be used with "G1" and "G2" in the first and second
-columns, respectively. Missing values in either "G1" or "G2"
+positions or a matrix of "G1" and "G2/M" peak positions. A larger matrix
+will be accepted, such as one produced with \code{\link[=peakFind]{peakFind()}}, but only the
+first two columns will be used and treated as "G1" and "G2" positions,
+respectively. Missing values in either "G1" or "G2"
 will be replaced by a value derived from \code{ratio}. If the argument \code{ peaks} is \code{NULL}, the function \code{\link[=peakFind]{peakFind()}} will be called with
 arguments \code{range.search} and \code{...} to identify the peaks.
 
-If the \code{logical} argument \code{only.G1 = TRUE}, a complete set of "G1"
-values must be provided and the data will only be translated to place
-the "G1" peak at the selected value.
+If the \code{logical} argument \code{scale = FALSE}, a complete set of "G1"
+values must be provided and the data will not be translated. The values
+only will be translated to place the "G1" peak at value specified
+in the argument \code{g1}. Note that this \strong{should not} be set to \code{TRUE}
+for data with bona fide peaks that are not true "G1" or "G2" peaks such
+those found in synchronized populations of cells as in the example.
 
-The transformed values will be trimmed to the range specified by \code{ limits}, which has a default value of \code{c(0, 1023)}. The full range of
+Transformed values will be trimmed to the range specified by
+\code{limits}, which has a default value of \code{c(0, 1023)}. The full range of
 original values will be used if \code{limits = NULL} and no trimming will
 occur if \code{limits = FALSE}.
 }

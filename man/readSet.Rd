@@ -29,12 +29,12 @@ default "SAMPLE ID"}
 keywords}
 
 \item{tfun}{Transformation function to apply to log-transformed values,
-either \ code{asinh} (default) or \code{log10}}
+either \code{asinh} (default) or \code{log10}}
 
-\item{depth}{Integer indicating bit depth (2^depth), 10 for FACVSCaliber, 24
-for Acurri}
+\item{depth}{Integer indicating bit depth (\code{2^depth}), 10 for
+FACSCaliber, 24 for Acurri}
 
-\item{log.cutoff}{Values greater than this value force log-transformation if 
+\item{log.cutoff}{Values greater than this value force transformation if 
 the argument \code{log.chan} is \code{NULL}, defaults to \code{2^depth}}
 
 \item{...}{Additional arguments to \code{\link{read.Flowset}}}

@@ -4,19 +4,22 @@
 #' 
 #' @md
 #' @details
-#' This function identifies the probable location of the G1 and G2 peaks
+#' This function identifies the probable location of the G1 and G2/M peaks
 #' in the `"FL2.A"` channel (or the channel
 #' specified by the argument `chan`) in a `flowFrame` or `flowSet`. Areas
 #' of high density are identified by the function defined in `curveFilter`. If 
 #' this is `NULL`, the [flowStats::curv1Filter()] function will be used 
 #' with optional arguments (`bwFac` or `gridsize`) passed in `...`.
 #' 
-#' Peak searching is limited to 0.5 to 99.5\% quantiles (default) or to the 
-#' values specified in `probs`. If no more than two peaks are found, they will 
-#' be labeled `"G1"` and `"G2"`. A single peak will be labeled as `"G1"` with
-#' an `NA` for the second peak, labeled as `"<G2>"`. If more peaks are found,
-#' they will be labeled `"peak1"`, `"peak2"`, `"peak3"`, etc.
-
+#' By default, peaks are accepted in the range defined by the 5th to 95th
+#' percentile or to the percentile values specified in `probs`. For
+#' well-behaved data, this can be set `c(50, 500)` to exclude apoptotic
+#' populations and populations greater than G2/M. If no more than two peaks
+#' are found, they will be labeled `"G1"` and `"G2"`. A single peak will be
+#' labeled as `"G1"` with an `NA` for the second peak, labeled as `"<G2>"`.
+#' If more than two peaks are found, all peaks will be labeled as 
+#' `"peak1"`, `"peak2"`, `"peak3"`, etc.
+#'
 #' @param x A `flowFrame` or `flowSet` with the parameter named in `chan`
 #' @param curveFilter Optional function that returns a `multipleFilterResult`
 #'   defining the regions of 1-D curvature in `chan`. If `NULL`, the
@@ -27,11 +30,12 @@
 #'   [stats::density()] function will be used with the bandwith adjusted
 #'   by the option `adj = 2`
 #' @param range.search Optional numeric vector of length 2 defining the
-#'   lower and upper limits to accept peaks. If `NULL` the search will be
-#'   limited to the values defined by the quantiles specified in `probs`
+#'   lower and upper limits to accept peaks. The default value of `NULL` 
+#'   limits the search to the range defined by the quantiles specified
+#'   in `probs`
 #' @param probs Numeric vector of length 2 defining the lower and upper
-#'   quantiles for valid peak values, default value of 0.5 to 0.95\%
-#'  (`probs = c(0.005, 0.995)`)
+#'   quantiles for valid peak values, the default value of 5 to 95\%
+#'   is specified by the argument `probs = c(0.05, 0.95)`
 #' @param ... Additional arguments to be passed to
 #'   [flowStats::curv1Filter()]
 #' 
@@ -44,7 +48,7 @@
 #' @export
 #' 
 peakFind <- function(x, curveFilter = NULL, chan = "FL2.A",
-		searchFun = NULL, range.search = NULL, probs = c(0.005, 0.995), ...)
+		searchFun = NULL, range.search = NULL, probs = c(0.05, 0.95), ...)
 {
 	# assign values to arguments
 	if (is.null(curveFilter))

@@ -12,13 +12,13 @@
 #'   to "." in names, default value of \code{TRUE}
 #' @param name.keyword Character string for the  FCS keyword used for names,
 #'   default "SAMPLE ID"
-#' @param  phenoData List to serve as the rudiments of the phenoData built from 
+#' @param phenoData List to serve as the rudiments of the phenoData built from 
 #'   keywords
-#' @param  tfun Transformation function to apply to log-transformed values,
-#'   either \ code{asinh} (default) or \code{log10}
-#' @param depth Integer indicating bit depth (2^depth), 10 for FACVSCaliber, 24
-#'   for Acurri
-#' @param log.cutoff Values greater than this value force log-transformation if 
+#' @param tfun Transformation function to apply to log-transformed values,
+#'   either \code{asinh} (default) or \code{log10}
+#' @param depth Integer indicating bit depth (\code{2^depth}), 10 for
+#'   FACSCaliber, 24 for Acurri
+#' @param log.cutoff Values greater than this value force transformation if 
 #'   the argument \code{log.chan} is \code{NULL}, defaults to \code{2^depth}
 #' @param ...	Additional arguments to \code{\link{read.Flowset}}
 #'
