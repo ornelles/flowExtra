@@ -32,7 +32,7 @@
 #' original values will be used if `limits = NULL` and no trimming will
 #' occur if `limits = FALSE`.
 #'
-#' @param fs A `flowSet` with data to be transfomred in channel in `chan`
+#' @param fs A `flowSet` with data to be transformed in channel in `chan`
 #' @param peaks An optional matrix of "G1" and "G2" peak values *or* a
 #'   vector "G1" values. The default value of `NULL` will use
 #'	 [peakFind()] to identify the peaks within the range specified by
@@ -48,7 +48,7 @@
 #'   will the the original limits of the data. If `FALSE` the range will be
 #'   `-Inf` to `+Inf`.
 #' @param range.search A numeric vector of length 2 specifying the range
-#'   of values in the orignal data in which peaks will be accepted. The
+#'   of values in the original data in which peaks will be accepted. The
 #'   default value of `c(50, 500)` is meant to ignore apoptotic values and
 #'   polyploid peaks
 #' @param scale A `logical` value to scale the data such that the "G1" and "G2"

@@ -1,6 +1,6 @@
 #' Locator Function for Lattice
 #' 
-#' Reads the position of the grapics cursor from a lattice panel
+#' Reads the position of the graphics cursor from a lattice panel
 #' 
 #' @details This provides a functional replacement for
 #' \code{\link{locator}} that works with \code{lattice} objects. A
@@ -15,12 +15,13 @@
 #' values in \code{"usr"} coordinates as a list.
 #' 
 #' @param n The maximum number of points to locate
-#' @param type One of \code{"dot", "v", "h", "both"} or \code{
-#'   "none"} to add a point, vertical line, horizontal line, or
-#'   both vertical and horizontal lines at each selected point
-#' @param ... Additional graphic parameters passed to either \
-#'   code{\link{panel.points}} or \code{\link{panel.abline}} if \
-#'   code{type != "none"}
+#' @param type One of \code{"dot", "v", "h", "both"} or 
+#'   \code{"none"} to add a point, vertical line, horizontal line,
+#'   both vertical and horizontal lines, or no mark at each selected
+#'   point
+#' @param ... Additional graphic parameters passed to either
+#'   \code{\link{panel.points}} or \code{\link{panel.abline}} if
+#'   \code{type != "none"}
 #' 
 #' @return
 #' A list containing \code{x} and \code{y} coordinates of the

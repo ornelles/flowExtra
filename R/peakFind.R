@@ -21,15 +21,15 @@
 #' `"peak1"`, `"peak2"`, `"peak3"`, etc.
 #'
 #' @param x A `flowFrame` or `flowSet` with the parameter named in `chan`
-#' @param curveFilter Optional function that returns a `multipleFilterResult`
+#' @param curveFilter An optional function that returns a `multipleFilterResult`
 #'   defining the regions of 1-D curvature in `chan`. If `NULL`, the
 #'   [flowStats::curv1Filter()] will be used
-#' @param chan Name of the data to be evaluated in `x`, default of `"FL2.A"`
-#' @param searchFun Optional function to determine the position of each
-#'   peak in defined by the argument `curvFilter`. If `NULL`, the
+#' @param chan The name of the data to be evaluated in `x`, default of `"FL2.A"`
+#' @param searchFun An optional function to determine the position of each
+#'   peak defined by application of `curvFilter`. If `NULL`, the
 #'   [stats::density()] function will be used with the bandwith adjusted
 #'   by the option `adj = 2`
-#' @param range.search Optional numeric vector of length 2 defining the
+#' @param range.search An optional numeric vector of length 2 defining the
 #'   lower and upper limits to accept peaks. The default value of `NULL` 
 #'   limits the search to the range defined by the quantiles specified
 #'   in `probs`

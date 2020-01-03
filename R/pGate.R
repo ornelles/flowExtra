@@ -1,6 +1,6 @@
 #' Create Arbitrary Gate from Lattice Panel
 #' 
-#' Interact with lattice plot to define a gate
+#' Interact with lattice flow plot to define a gate
 #' 
 #' @param type Type of gate as a character string (see details)
 #' @param vertical,horizontal Logical values to impose vertical or
@@ -33,7 +33,7 @@
 #' }
 #' 
 #' The implementation of \code{\link{ellipsoidGate}} does not seem to honor 
-#' the covariance parameters, so the distance parameter has been arbitrarily  
+#' the covariance parameter, so the distance parameter has been arbitrarily  
 #' adjusted by the square root of 2 to make up for this quirk.
 #' 
 #' @return
