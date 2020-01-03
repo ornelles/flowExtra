@@ -23,7 +23,7 @@
 # 	exprs(fs2[[i]])[, "FL2.A"] <- exprs(fs2[[i]])[, "FL2.A"] + adj[i]
 # densityplot(~FL2.A, fs, darg = list(adjust = 0.1), main = "Unadjusted", xlim = c(0, 500))
 # densityplot(~FL2.A, fs2, darg = list(adjust = 0.2), main = "G1 aligned", xlim = c(0, 600))
-
+# 
 #
 # extract ellipsoid gate parameters from filter result for drawing or calculating
 # example:
@@ -146,72 +146,6 @@ addText <- function(x, y, labels, col = "red", cex = 2/3, adj = 0.5) {
 	}
 }
 
-#
-# peakFind - find G1 and G2 peaks in FL2.A values if more than two peaks are found by
-# curve1Filter(), peaks will be named peak1, peak2, peak3 etc. Otherwise, the peaks are
-# named "G1" and "G2". A single peak will be treated as G1 with NA for the <G2> peak
-# argument x is either a flowframe or a flowset. Additional arguments in ... are handed to
-# curv1Filter
-#
-# May 2011 - quantiles to assign ranges with "probs" if range.search is NULL
-#
-peakFind <- function(x, curveFilter = NULL, chan = "FL2.A",
-		searchFun = NULL, range.search = NULL, probs = c(0.05, 0.995), ...)
-{
-#
-# internal function to perform peak finding a flowFrame
-#
-	.peakFind <- function(x, curveFilter, chan, searchFun, range.search) {
-		res <- filter(x, curveFilter)
-		peaks <- tapply(exprs(x)[, chan], res@subSet, searchFun, na.rm = TRUE)[-1]
-
-# assign value to range.search if needed
-
-		if (is.null(range.search))
-			range.search <- quantile(exprs(x)[, chan], probs = probs, na.rm = TRUE)
-
-# drop NA values, drop peaks outside of range.search
-
-		peaks <- peaks[!is.na(peaks)]
-		peaks <- peaks[peaks > range.search[1] & peaks < range.search[2]]
-
-		if (length(peaks) == 2)			# assume G1 and G2 peak found
-			names(peaks) <- c("G1", "G2")
-		else if (length(peaks) == 1)	{	# assume only G1 peak found
-			peaks[2] <- NA
-			names(peaks) <- c("G1", "<G2>")
-			warning(identifier(x), ": one peak found", call. = FALSE)
-		}
-		else {
-			warning(identifier(x), ": ", length(peaks), " peaks found", call. = FALSE)
-			names(peaks) <- paste("peak", 1:length(peaks), sep="")
-		}
-		return(peaks)
-	}
-
-	if (is.null(curveFilter))
-		curveFilter <- curv1Filter(chan, ...)
-
-	if (is.null(searchFun)) # use maximum of kernel density with 2x default bandwidth
-		searchFun <- function(x, adj = 2, na.rm = TRUE) {
-			kd <- density(x, adj = adj)
-			kd$x[kd$y == max(kd$y)][1]	# in case of ties or multiple points
-		}
-	
-	if (class(x) == "flowFrame")
-		return(.peakFind(x, curveFilter, chan, searchFun, range.search))
-	else if (class(x) == "flowSet") {
-		val <- fsApply(x, peakFind, curveFilter, chan, searchFun, range.search, simplify = FALSE)
-		val.range <- range(sapply(val, length), na.rm=T)
-		cnames <- names(val[[which(sapply(val, length) == val.range[2])[1]]])
-		val <- lapply(val, function(x) c(x, rep(NA, val.range[2] - length(x))))
-		val <- t(as.data.frame(val))
-		colnames(val) <- cnames
-		return(val)
-	}
-	else
-		stop("unable to operate on argument of class ", class(x))
-}
 
 #
 # peakNormalize - transform flowSet to normalize "G1" and "G2" peaks against a reference
@@ -262,7 +196,6 @@ peakNormalize <- function(fs, peaks = NULL, g1.peak = 200, g2.peak = g1.peak * r
 
 	missingG2 <- is.na(peaks[,2])
 	peaks[missingG2, 2] <- peaks[missingG2, 1] * ratio
-
 
 # adjust any invisible G1 peaks by assuming a value of G2 / ratio
 
