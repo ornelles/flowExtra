@@ -4,10 +4,18 @@
 \alias{readSet}
 \title{Read and Transform Flow Set}
 \usage{
-readSet(path = ".", pattern = "\\\\d\\\\d\\\\d$", log.chan = NULL,
-  alter.names = TRUE, name.keyword = "SAMPLE ID",
+readSet(
+  path = ".",
+  pattern = "\\\\d\\\\d\\\\d$",
+  log.chan = NULL,
+  alter.names = TRUE,
+  name.keyword = "SAMPLE ID",
   phenoData = list(date = "$DATE", sample = "SAMPLE ID"),
-  tfun = c("asinh", "log10"), depth = 10, log.cutoff = 2^depth, ...)
+  tfun = c("asinh", "log10"),
+  depth = 10,
+  log.cutoff = 2^depth,
+  ...
+)
 }
 \arguments{
 \item{path}{A character vector identifying the path to search for the FSC
@@ -47,7 +55,9 @@ A wrapper to \code{\link{read.flowSet}} to read a flow set.
 }
 \details{
 Files in the directory specified by \code{path} that match 
-the \code{grep} pattern specified in \code{pattern} will be read with #' \code{\link{read.flowSet}}. Parameter names will be adjusted if
+the \code{grep} pattern specified in \code{pattern} will be read with
+\code{\link{read.flowSet}}. Parameter names will be adjusted if
 \code{alter.names = TRUE} to replace \code{"-"} with \code{"."}. A 
-minimal amount of \code{phenoData} will be assigned from
+minimal amount of \code{phenoData} will be assigned from the $DATE
+and "SAMPLE ID" keywords.
 }

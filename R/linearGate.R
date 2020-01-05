@@ -34,9 +34,9 @@
 #'   single cells with default values of \code{"FL2.A"} and \code{"FL2.H"}
 #' @param zero.intercept If \code{TRUE} (the default), the regression used
 #'   to identify the singlets will be forced through the origin
-#' @param dx,dy The width and height of rectangular gate, with a default
-#'   value of 0.06. If only \code{dx} is specified, \code{dy} will be
-#'   assigned the same value as \code{dx}
+#' @param width The width of the rotated rectangular gate as a fraction
+#'   of the instrument data range for the \code{xchan} parameter,
+#'   with a default value of 5 \% (0.05)
 #' @param xRange A numeric value of length two to specify the upper and
 #'   lower percentile range of the data in \code{xchan} to be used for the
 #'   regression. If \code{NULL}, a default value of \code{c(0.025, 0.975)}
@@ -58,7 +58,7 @@
 #' @export
 #'
 linearGate <- function(x, xchan = "FL2.A", ychan = "FL2.H",
-		zero.intercept = TRUE, dx = 0.06, dy = dx, xRange = NULL,
+		zero.intercept = TRUE, width = 0.05, xRange = NULL,
 		gRange = TRUE, filterId = "singlets",
 		groupFilterId = "singletsGateList")
 {
@@ -109,7 +109,7 @@ linearGate <- function(x, xchan = "FL2.A", ychan = "FL2.H",
 # gRange holds either quantiles or absolute values to limit gate
 # dataRange holds the actual range of values for xhan
 #
-	.linearGate <- function(mat, xchan, ychan, dx, dy,
+	.linearGate <- function(mat, xchan, ychan, width,
 			xRange, gRange, dataRange, filterId)
 	{
 	# collect data as data.frame of two variables
@@ -138,11 +138,18 @@ linearGate <- function(x, xchan = "FL2.A", ychan = "FL2.H",
 				xp <- gRange * diff(dataRange) + min(dataRange)
 			yp <- predict(fm, newdata = data.frame(x = xp))
 	
-			xinc <- 0.5 * dx * diff(range(dat$x, na.rm = TRUE))
-			yinc <- 0.5 * dy * diff(range(dat$y, na.rm = TRUE))
+	# calcuate vertices of rotated rectangle of width 'w'
+			theta <- atan2(diff(yp), diff(xp))
+			dx <- (diff(dataRange) * width/2) * sin(theta)
+			dy <- (diff(dataRange) * width/2) * cos(theta)
+			x.vertices <- c(xp[1] - dx, xp[1] + dx, xp[2] + dx, xp[2] - dx)
+			y.vertices <- c(yp[1] + dy, yp[1] - dy, yp[2] - dy, yp[2] + dy)
 
-			x.vertices <- c(xp[1] - xinc, xp[1] + xinc, xp[2] + xinc, xp[2] - xinc)
-			y.vertices <- c(yp[1] + yinc, yp[1] - yinc, yp[2] - yinc, yp[2] + yinc)
+#			xinc <- 0.5 * dx * diff(range(dat$x, na.rm = TRUE))
+#			yinc <- 0.5 * dy * diff(range(dat$y, na.rm = TRUE))
+
+#			x.vertices <- c(xp[1] - xinc, xp[1] + xinc, xp[2] + xinc, xp[2] - xinc)
+#			y.vertices <- c(yp[1] + yinc, yp[1] - yinc, yp[2] - yinc, yp[2] + yinc)
 			filterIdValue <- filterId
 		}
 		else { # lqs failed, return zero-width gate
@@ -158,13 +165,13 @@ linearGate <- function(x, xchan = "FL2.A", ychan = "FL2.H",
 
 # dispatch function on nature of argument 'x'
 	if (class(x) == "matrix")
-		ret <- .linearGate(x, xchan, ychan, dx, dy, xRange, gRange,
+		ret <- .linearGate(x, xchan, ychan, width, xRange, gRange,
 			dataRange, filterId)
 	else if (class(x) == "flowFrame")
-		ret <- .linearGate(exprs(x), xchan, ychan, dx, dy, xRange, gRange,
+		ret <- .linearGate(exprs(x), xchan, ychan, width, xRange, gRange,
 			dataRange, filterId)
 	else if (class(x) == "flowSet") {
-		ret <- fsApply(x, .linearGate, xchan, ychan, dx, dy, xRange, gRange,
+		ret <- fsApply(x, .linearGate, xchan, ychan, width, xRange, gRange,
 			dataRange, filterId, use.exprs = TRUE)
 		ret <- filterList(ret, filterId = groupFilterId)
 	}

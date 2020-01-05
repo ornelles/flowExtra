@@ -4,9 +4,13 @@
 \alias{pGate}
 \title{Create Arbitrary Gate from Lattice Panel}
 \usage{
-pGate(type = c("arbitrary", "parallel", "convex", "ellipse"),
-  vertical = TRUE, horizontal = FALSE, filterId = NULL,
-  adjust.ellipse.distance = sqrt(2))
+pGate(
+  type = c("arbitrary", "parallel", "convex", "ellipse"),
+  vertical = TRUE,
+  horizontal = FALSE,
+  filterId = NULL,
+  adjust.ellipse.distance = sqrt(2)
+)
 }
 \arguments{
 \item{type}{Type of gate as a character string (see details)}

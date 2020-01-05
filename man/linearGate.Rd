@@ -4,10 +4,17 @@
 \alias{linearGate}
 \title{Create Gate for Single Cells}
 \usage{
-linearGate(x, xchan = "FL2.A", ychan = "FL2.H",
-  zero.intercept = TRUE, dx = 0.06, dy = dx, xRange = NULL,
-  gRange = TRUE, filterId = "singlets",
-  groupFilterId = "singletsGateList")
+linearGate(
+  x,
+  xchan = "FL2.A",
+  ychan = "FL2.H",
+  zero.intercept = TRUE,
+  width = 0.05,
+  xRange = NULL,
+  gRange = TRUE,
+  filterId = "singlets",
+  groupFilterId = "singletsGateList"
+)
 }
 \arguments{
 \item{x}{Either a matrix from \code{\link[Biobase]{exprs}}, a
@@ -19,9 +26,9 @@ single cells with default values of \code{"FL2.A"} and \code{"FL2.H"}}
 \item{zero.intercept}{If \code{TRUE} (the default), the regression used
 to identify the singlets will be forced through the origin}
 
-\item{dx, dy}{The width and height of rectangular gate, with a default
-value of 0.06. If only \code{dx} is specified, \code{dy} will be
-assigned the same value as \code{dx}}
+\item{width}{The width of the rotated rectangular gate as a fraction
+of the instrument data range for the \code{xchan} parameter,
+with a default value of 5 \% (0.05)}
 
 \item{xRange}{A numeric value of length two to specify the upper and
 lower percentile range of the data in \code{xchan} to be used for the

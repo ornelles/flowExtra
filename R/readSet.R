@@ -23,9 +23,11 @@
 #' @param ...	Additional arguments to \code{\link{read.Flowset}}
 #'
 #' @details Files in the directory specified by \code{path} that match 
-#' the \code{grep} pattern specified in \code{pattern} will be read with #' \code{\link{read.flowSet}}. Parameter names will be adjusted if
+#' the \code{grep} pattern specified in \code{pattern} will be read with
+#' \code{\link{read.flowSet}}. Parameter names will be adjusted if
 #' \code{alter.names = TRUE} to replace \code{"-"} with \code{"."}. A 
-#' minimal amount of \code{phenoData} will be assigned from  
+#' minimal amount of \code{phenoData} will be assigned from the $DATE
+#' and "SAMPLE ID" keywords.
 #'
 #' @return
 #' 
