@@ -4,12 +4,12 @@
 \alias{locator2}
 \title{Locator Function for Lattice}
 \usage{
-locator2(n = 512, type = c("dot", "v", "h", "both", "none"), ...)
+locator2(n = 512, type = c("p", "v", "h", "both", "none"), ...)
 }
 \arguments{
 \item{n}{The maximum number of points to locate}
 
-\item{type}{One of \code{"dot", "v", "h", "both"} or 
+\item{type}{One of \code{"p", "v", "h", "both"} or 
 \code{"none"} to add a point, vertical line, horizontal line,
 both vertical and horizontal lines, or no mark at each selected
 point}

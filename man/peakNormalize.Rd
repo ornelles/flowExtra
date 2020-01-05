@@ -11,8 +11,8 @@ peakNormalize(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
 \arguments{
 \item{fs}{A \code{flowSet} with data to be transformed in channel in \code{chan}}
 
-\item{peaks}{An optional matrix of "G1" and "G2" peak values \emph{or} a
-vector "G1" values. The default value of \code{NULL} will use
+\item{peaks}{An optional matrix of "G1" and "G2/M" peak values \emph{or} a
+vector of "G1" values. The default value of \code{NULL} will use
 \code{\link[=peakFind]{peakFind()}} to identify the peaks within the range specified by
 \code{range.search}}
 
@@ -28,16 +28,17 @@ vector "G1" values. The default value of \code{NULL} will use
 
 \item{limits}{Numeric vector of length 2 specifying the limits for the
 transformed data (default value of \code{c(0, 1023)}). If \code{NULL}, the range
-will the the original limits of the data. If \code{FALSE} the range will be
+will be the original limits of the data. If \code{FALSE} the range will be
 \code{-Inf} to \code{+Inf}.}
 
 \item{range.search}{A numeric vector of length 2 specifying the range
 of values in the original data in which peaks will be accepted. The
-default value of \code{c(50, 500)} is meant to ignore apoptotic values and
-polyploid peaks}
+default value of \code{c(50, 500)} is chosen to ignore apoptotic values and
+polyploid peaks in typical data}
 
-\item{scale}{A \code{logical} value to scale the data such that the "G1" and "G2"
-peaks occur at the values in \code{g1} and \code{g2}, respectively. See details}
+\item{scale}{A \code{logical} value to scale the data such that the "G1" and
+"G2/M" peaks occur at the values in \code{g1} and \code{g2}, respectively.
+See Details for more information}
 
 \item{...}{Additional arguments passed to \code{\link[=peakFind]{peakFind()}} and then to
 \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}}}
@@ -49,10 +50,13 @@ A transformed and (optionally) scaled \code{flowSet}.
 Normalize "G1" and "G2" peaks in DNA profile data
 }
 \details{
-This function attempts to translate a linear DNA profile data to align
-peaks corresponding to a "G1" population of cells. The "G2" peak will
-be adjusted by scaling to be positioned at the value given by \code{ratio * g1} where \code{g1} is the position of the "G1" peak. Although this ratio
-should theoretically be 2.0, it is empirically closer to 1.9.
+This function attempts to translate and scale linear DNA profile
+data to align peaks corresponding to a "G1" and "G2/M" population
+of cells. Data will be adjusted by translating the data in order
+to place the "G1" peak at the value in \code{g1}. If \code{scale = TRUE},
+data will be scaled to place the "G2/M" peak at the value
+in \code{g2}. If \code{g2} is missing, the value for \code{g2} is given by \code{ratio * g1}. Although this ratio should theoretically be 2.0, it is
+empirically closer to 1.9.
 
 The position of the actual peaks is specified in the optional argument
 \code{peaks}. If provided, this can either be a vector of "G1" peak
@@ -64,11 +68,12 @@ will be replaced by a value derived from \code{ratio}. If the argument \code{ pe
 arguments \code{range.search} and \code{...} to identify the peaks.
 
 If the \code{logical} argument \code{scale = FALSE}, a complete set of "G1"
-values must be provided and the data will not be translated. The values
-only will be translated to place the "G1" peak at value specified
+values must be provided and data will \strong{not} be scaled. The values
+will only be translated to place the "G1" peak at value specified
 in the argument \code{g1}. Note that this \strong{should not} be set to \code{TRUE}
-for data with bona fide peaks that are not true "G1" or "G2" peaks such
-those found in synchronized populations of cells as in the example.
+for data with \emph{bona fide} peaks that are not true "G1" or "G2" peaks
+such those found in synchronized populations of cells as in the
+example.
 
 Transformed values will be trimmed to the range specified by
 \code{limits}, which has a default value of \code{c(0, 1023)}. The full range of

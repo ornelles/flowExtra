@@ -10,23 +10,23 @@ readSet(path = ".", pattern = "\\\\d\\\\d\\\\d$", log.chan = NULL,
   tfun = c("asinh", "log10"), depth = 10, log.cutoff = 2^depth, ...)
 }
 \arguments{
-\item{path}{A character vector identifying the path to search for the FSC
+\item{path}{A character vector identifying the path to search for FSC
 files, defaults to current directory}
 
-\item{pattern}{Grep pattern to identify fsc files, defaults to
+\item{pattern}{Grep pattern to identify FSC files, defaults to
 \code{"\\d\\d\\d$"}}
 
 \item{log.chan}{Character vector of channels to be log-transformed (after
-"alter.names")}
+the \code{"alter.names"} option is applied)}
 
-\item{alter.names}{Logical value passed to \code{read.flowSet} to change "-"
-to "." in names, default value of \code{TRUE}}
+\item{alter.names}{Logical value passed to \code{read.flowSet} to 
+change "-" to "." in names, default value of \code{TRUE}}
 
 \item{name.keyword}{Character string for the  FCS keyword used for names,
-default "SAMPLE ID"}
+default of \code{"SAMPLE ID"}}
 
-\item{phenoData}{List to serve as the rudiments of the phenoData built from 
-keywords}
+\item{phenoData}{List to serve as the rudiments of the \code{phenoData} 
+built from the keywords \code{"$DATE"} and \code{"SAMPLE ID"}}
 
 \item{tfun}{Transformation function to apply to log-transformed values,
 either \code{asinh} (default) or \code{log10}}
@@ -34,10 +34,10 @@ either \code{asinh} (default) or \code{log10}}
 \item{depth}{Integer indicating bit depth (\code{2^depth}), 10 for
 FACSCaliber, 24 for Acurri}
 
-\item{log.cutoff}{Values greater than this value force transformation if 
+\item{log.cutoff}{Values greater than this cutoff force transformation if 
 the argument \code{log.chan} is \code{NULL}, defaults to \code{2^depth}}
 
-\item{...}{Additional arguments to \code{\link{read.Flowset}}}
+\item{...}{Additional arguments to \code{\link[flowCore]{read.flowSet}}}
 }
 \value{
 Flow Set with transformed and name-adjusted parameters.

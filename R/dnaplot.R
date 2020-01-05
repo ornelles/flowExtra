@@ -1,6 +1,6 @@
 #' Densityplot for DNA Profiles
 #' 
-#' This is a wrapper for [flowViz::densityplot()] with defaults for
+#' A wrapper for [flowViz::densityplot()] with defaults for
 #' DNA profiles. 
 #' 
 #' @md
@@ -22,7 +22,7 @@
 #'   densityplot(..., dargs = list(adjust = adjust, n = n))
 #' ```
 #' 
-#' @return Invisibly return the lattice object.
+#' @return Plot the data and invisibly return the lattice object.
 #' 
 #' @import flowViz
 #'

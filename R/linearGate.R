@@ -1,7 +1,7 @@
 #' Create Gate for Single Cells
 #'
 #' Fit a narrow rectangular gate to select single cells in a 2-D
-#' plot of area x height
+#' plot of \code{area} x \code{height}
 #'
 #' @details#' This function creates a data-driven gate to select single cells from
 #' \code{area} and \code{height} values collected on a linear scale. A
@@ -9,13 +9,13 @@
 #' \code{\link[MASS]{lqs}}. This regression is used to create a narrow
 #' rectangular gate centered about the single cells. If
 #' \code{zero.intercept = TRUE}, the regression is forced through origin.
-#' By default, the regression is applied to values within the 2.5 to 98.5
+#' By default, the regression is applied to values within the 2.5 to 97.5
 #' percentiles of data in channel \code{xchan}. Other percentiles can be
 #' specified with the argument \code{xRange}.
 #' 
 #' The resulting \code{polygonGate(s)} will be limited to the range of
 #' values specified by \code{gRange}. If \code{gRange = TRUE}, the gate
-#' will be limited to the 2.5 to 97.5 percentile of data in
+#' will be limited to the 2.5 to 97.5 percentile of all data in
 #' channel \code{xchan}. If \code{gRange = FALSE}, the gate will
 #' span the full range of data. If \code{gRange} is a numeric vector of
 #' values less than or equal to 1, \code{gRange} will be treated as
@@ -29,17 +29,18 @@
 #' \code{ychan = "FL2.H"}
 #'
 #' @param x Either a matrix from \code{\link[Biobase]{exprs}}, a
-#'   \code{flowFrame}, or a \code{flowSet}
+#'   \code{\link[flowCore]{flowFrame}}, or a \code{\link[flowCore]{flowSet}}
 #' @param xchan,ychan Character strings identifying the data to search for
 #'   single cells with default values of \code{"FL2.A"} and \code{"FL2.H"}
-#' @param zero.intercept If \code{TRUE} (the default), the regression used
-#'   to identify the singlets will be forced through the origin
-#' @param width The width of the rotated rectangular gate \emph{either}
-#'   as a fraction of the \strong{instrument data range} for the
-#'   \code{xchan} parameter \emph{or}, if greater than 1, the absolute width
-#'   of the gate in the same units as \code{xchan}
+#' @param zero.intercept If \code{TRUE} (the default), force the regression
+#'   used to identify the singlets through the origin
+#' @param width The width (narrow dimension) of the rotated rectangular gate
+#'   expressed as \emph{either} as a fraction of the \strong{instrument data 
+#'   range} for the \code{xchan} parameter (if less than 1) \emph{or}
+#'   the absolute width of the gate in the same units as \code{xchan}, if
+#'   greater than 1
 #' @param xRange A numeric value of length two to specify the upper and
-#'   lower percentile range of the data in \code{xchan} to be used for the
+#'   lower percentile of the data in \code{xchan} to be used for the
 #'   regression. If \code{NULL}, a default value of \code{c(0.025, 0.975)}
 #'   will be used
 #' @param gRange A \code{logical} value \emph{or} a numeric vector of length
@@ -47,6 +48,8 @@
 #'   can be specified by quantiles or absolute values. See the Details
 #'   section for more information
 #' @param filterId Character string with default value of \code{"singlets"}
+#'   for successful fits. An unsuccessful fit is labeled
+#'   \code{"unfiltered"}
 #' @param groupFilterId Character string with default value of
 #'   \code{"singletsGateList"}
 #'
@@ -77,6 +80,8 @@ linearGate <- function(x, xchan = "FL2.A", ychan = "FL2.H",
 
 # convert xRange to a vector of two quantiles 
 	if (identical(xRange, NULL))
+		xRange <- QUANTILES
+	else if (identical(xRange, TRUE))
 		xRange <- QUANTILES
 	else if (length(xRange) > 1 && all(xRange <= 1))
 		xRange <- range(xRange)
@@ -148,18 +153,13 @@ linearGate <- function(x, xchan = "FL2.A", ychan = "FL2.H",
 				xp <- gRange * diff(dataRange) + min(dataRange)
 			yp <- predict(fm, newdata = data.frame(x = xp))
 	
-	# calcuate vertices of rotated rectangle of width 'w'
+	# calculate vertices of rotated rectangle of width 'w'
 			theta <- atan2(diff(yp), diff(xp))
 			dx <- (width/2) * sin(theta)
 			dy <- (width/2) * cos(theta)
+
 			x.vertices <- c(xp[1] - dx, xp[1] + dx, xp[2] + dx, xp[2] - dx)
 			y.vertices <- c(yp[1] + dy, yp[1] - dy, yp[2] - dy, yp[2] + dy)
-
-#			xinc <- 0.5 * dx * diff(range(dat$x, na.rm = TRUE))
-#			yinc <- 0.5 * dy * diff(range(dat$y, na.rm = TRUE))
-
-#			x.vertices <- c(xp[1] - xinc, xp[1] + xinc, xp[2] + xinc, xp[2] - xinc)
-#			y.vertices <- c(yp[1] + yinc, yp[1] - yinc, yp[2] - yinc, yp[2] + yinc)
 			filterIdValue <- filterId
 		}
 		else { # lqs failed, return zero-width gate

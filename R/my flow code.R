@@ -17,14 +17,20 @@
 # dropbox <- if (.Platform$OS.type == "unix") "~/Dropbox" else "~/../Dropbox"
 # path <- file.path(dropbox, "/docs/flow/2011 data/2011_0124 rpe1 synch roberta")
 # fs <- readSet(path)
+# pd <- read.csv(file.path(path, "phenoData.csv"), stringsAsFactors = FALSE)
+# pData(fs)$hpr <- factor(pd$hpr)
+# pData(fs)$type <- factor(c("asynch", rep("synch", 14), "asynch"))
+# pData(fs)$sample <- factor(pd$sample, levels = pd$sample[order(pd$hpr)])
+# 
 # fs <- Subset(fs, boundaryFilter("FL2.A"))
-# fs2 <- Subset(fs, linearGate(fs))
-# fs3 <- peakNormalize(fs2, g1 = 187)
-# dnaplot(~FL2.A, fs, main = "Raw data", xlim = c(0, 500))
-# dnaplot(~FL2.A, fs2, main = "Singlets", xlim = c(0, 500))
-# dnaplot(~FL2.A, fs3, main = "Correct G1 aligned", xlim = c(0, 500))
+# lg <- linearGate(fs)
+# fs2 <- Subset(fs, lg)
+# fs3 <- peakNormalize(fs2, g1 = 170)
+# dnaplot(sample ~ FL2.A, fs, main = "Raw data", xlim = c(0, 500))
+# dnaplot(sample ~FL2.A, fs2, main = "Singlets", xlim = c(0, 500))
+# dnaplot(sample ~FL2.A, fs3, main = "Correct G1 aligned", xlim = c(0, 500))
 # fs4 <- peakNormalize(fs2, g1 = 170, scale = TRUE)
-# dnaplot(~FL2.A, fs4, main = "Incorrect use of 'scale = TRUE'", xlim = c(0, 500)) 
+# dnaplot(sample ~FL2.A, fs4, main = "Incorrect use of 'scale = TRUE'", xlim = c(0, 500)) 
 #
 # extract ellipsoid gate parameters from filter result for drawing or calculating
 # example:

@@ -15,7 +15,7 @@
 #' values in \code{"usr"} coordinates as a list.
 #' 
 #' @param n The maximum number of points to locate
-#' @param type One of \code{"dot", "v", "h", "both"} or 
+#' @param type One of \code{"p", "v", "h", "both"} or 
 #'   \code{"none"} to add a point, vertical line, horizontal line,
 #'   both vertical and horizontal lines, or no mark at each selected
 #'   point
@@ -31,7 +31,7 @@
 #' 
 #' @export
 #' 
-locator2 <- function(n = 512, type = c("dot", "v", "h", "both", "none"),
+locator2 <- function(n = 512, type = c("p", "v", "h", "both", "none"),
 		...)
 {
 	type <- match.arg(type)
@@ -58,7 +58,7 @@ locator2 <- function(n = 512, type = c("dot", "v", "h", "both", "none"),
 			do.call(panel.abline, args = list(v = xc, ...))
 		if (type == "h" | type == "both")
 			do.call(panel.abline, args = list(h = yc, ...))
-		if (type == "dot")
+		if (type == "p")
 			do.call(panel.points, args = list(x = xc, y = yc, ...))
 		x <- c(x, xc)
 		y <- c(y, yc)

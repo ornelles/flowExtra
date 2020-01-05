@@ -2,25 +2,25 @@
 #' 
 #' A wrapper to \code{\link{read.flowSet}} to read a flow set.
 #' 
-#' @param path A character vector identifying the path to search for the FSC
+#' @param path A character vector identifying the path to search for FSC
 #'   files, defaults to current directory
-#' @param pattern Grep pattern to identify fsc files, defaults to
+#' @param pattern Grep pattern to identify FSC files, defaults to
 #'   \code{"\\d\\d\\d$"}
 #' @param log.chan Character vector of channels to be log-transformed (after
-#'  "alter.names")
-#' @param alter.names Logical value passed to \code{read.flowSet} to change "-"
-#'   to "." in names, default value of \code{TRUE}
+#'  the \code{"alter.names"} option is applied)
+#' @param alter.names Logical value passed to \code{read.flowSet} to 
+#'   change "-" to "." in names, default value of \code{TRUE}
 #' @param name.keyword Character string for the  FCS keyword used for names,
-#'   default "SAMPLE ID"
-#' @param phenoData List to serve as the rudiments of the phenoData built from 
-#'   keywords
+#'   default of \code{"SAMPLE ID"}
+#' @param phenoData List to serve as the rudiments of the \code{phenoData} 
+#'    built from the keywords \code{"$DATE"} and \code{"SAMPLE ID"}
 #' @param tfun Transformation function to apply to log-transformed values,
 #'   either \code{asinh} (default) or \code{log10}
 #' @param depth Integer indicating bit depth (\code{2^depth}), 10 for
 #'   FACSCaliber, 24 for Acurri
-#' @param log.cutoff Values greater than this value force transformation if 
+#' @param log.cutoff Values greater than this cutoff force transformation if 
 #'   the argument \code{log.chan} is \code{NULL}, defaults to \code{2^depth}
-#' @param ...	Additional arguments to \code{\link{read.Flowset}}
+#' @param ...	Additional arguments to \code{\link[flowCore]{read.flowSet}}
 #'
 #' @details Files in the directory specified by \code{path} that match 
 #' the \code{grep} pattern specified in \code{pattern} will be read with

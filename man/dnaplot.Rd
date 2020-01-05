@@ -18,10 +18,10 @@ be estimated, increased from 50 to 512}
 \item{data}{\code{flowFrame} or \code{flowSet} with data}
 }
 \value{
-Invisibly return the lattice object.
+Plot the data and invisibly return the lattice object.
 }
 \description{
-This is a wrapper for \code{\link[flowViz:densityplot]{flowViz::densityplot()}} with defaults for
+A wrapper for \code{\link[flowViz:densityplot]{flowViz::densityplot()}} with defaults for
 DNA profiles.
 }
 \details{
