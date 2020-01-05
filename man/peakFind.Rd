@@ -10,18 +10,18 @@ peakFind(x, curveFilter = NULL, chan = "FL2.A", searchFun = NULL,
 \arguments{
 \item{x}{A \code{flowFrame} or \code{flowSet} with the parameter named in \code{chan}}
 
-\item{curveFilter}{Optional function that returns a \code{multipleFilterResult}
+\item{curveFilter}{An optional function that returns a \code{multipleFilterResult}
 defining the regions of 1-D curvature in \code{chan}. If \code{NULL}, the
 \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} will be used}
 
-\item{chan}{Name of the data to be evaluated in \code{x}, default of \code{"FL2.A"}}
+\item{chan}{The name of the data to be evaluated in \code{x}, default of \code{"FL2.A"}}
 
-\item{searchFun}{Optional function to determine the position of each
-peak in defined by the argument \code{curvFilter}. If \code{NULL}, the
+\item{searchFun}{An optional function to determine the position of each
+peak defined by application of \code{curvFilter}. If \code{NULL}, the
 \code{\link[stats:density]{stats::density()}} function will be used with the bandwith adjusted
 by the option \code{adj = 2}}
 
-\item{range.search}{Optional numeric vector of length 2 defining the
+\item{range.search}{An optional numeric vector of length 2 defining the
 lower and upper limits to accept peaks. The default value of \code{NULL}
 limits the search to the range defined by the quantiles specified
 in \code{probs}}

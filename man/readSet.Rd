@@ -43,5 +43,11 @@ the argument \code{log.chan} is \code{NULL}, defaults to \code{2^depth}}
 Flow Set with transformed and name-adjusted parameters.
 }
 \description{
-Read a flow set and transform values with maximum values above given cutoff.
+A wrapper to \code{\link{read.flowSet}} to read a flow set.
+}
+\details{
+Files in the directory specified by \code{path} that match 
+the \code{grep} pattern specified in \code{pattern} will be read with #' \code{\link{read.flowSet}}. Parameter names will be adjusted if
+\code{alter.names = TRUE} to replace \code{"-"} with \code{"."}. A 
+minimal amount of \code{phenoData} will be assigned from
 }

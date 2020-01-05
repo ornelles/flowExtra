@@ -12,15 +12,15 @@ getFres(x, filter, what = c("p", "true", "count", "n", "positive",
 get.p(x, filter, as.percent = FALSE, excluded = FALSE)
 }
 \arguments{
-\item{x}{Either a \code{filterResult} \emph{or} a \code{flowFrame}
-or \code{flowSet}}
+\item{x}{Either a \code{filterResult} or a \code{flowFrame}
+or a \code{flowSet}}
 
 \item{filter}{An optional \code{filter}, required if \code{x} is not a
 \code{filterResult}}
 
 \item{what}{A single character string specifying the statistic to
-return. The default value of "p" extracts the positive fraction.
-(see Details for other options)}
+return. The default value of \code{"p"} extracts the positive
+fraction. (See the Details section for other options)}
 
 \item{as.percent}{If \code{TRUE}, return the positive fraction (or
 negative fraction) as a formatted character string}
@@ -28,8 +28,8 @@ negative fraction) as a formatted character string}
 \item{excluded}{If \code{TRUE}, return the negative fraction or
 negative population}
 
-\item{fmt}{Character format string for \code{sprintf} if the argument
-\code{as.percent = TRUE}}
+\item{fmt}{Character format string for \code{\link{sprintf}} if the
+argument \code{as.percent = TRUE}}
 }
 \value{
 For \code{getFres}: a numeric vector of the desired statistic \emph{or}
@@ -59,20 +59,22 @@ If the first argument (\code{x}) is a \code{filterResult} or \code{
 filterResultList}, the argument \code{filter} is ignored \emph{unless}
 it is a single character string that will be interpreted as \code{what}.
 This allows for lazy applications of the function to filter results
-such as \code{getFres(res, "n")} to extract the number of positive
+such as \code{getFres(res, "n")} to extract the total number of
 events from the object \code{res}. If the first argument is 
 a \code{flowFrame} or \code{flowSet}, \code{filter} must be
 provided in order to apply it to the data before extracting
 the statistic.
 
-The specific statistic can be specified by several methods. The default
-value is "p" for the positive fraction. The negative fraction can be
-extracted with the option \code{excluded = TRUE}. If \code{as.percent =
-TRUE}, the value will be returned as a character string formatted with
-\code{\link{sprintf}} according the string in \code{fmt}. The number of
-positive events can be retrieved by \code{what = "true"} or \code{what =
-"positive"}. The total number of events can be retrieved with
-\code{what = "count"}. The number of negative events can be retrieved by
-\code{what = "negative"}. Note that with these last two options, 
+The specific statistic can be specified by the character value in
+\code{what} as indicated below:
+\tabular{ll}{
+	\code{"p"} \tab The positive fraction of events. \cr
+	\code{"true"} \tab Number of positive events. \cr
+	\code{"positive"} \tab Number of positive events. \cr
+	\code{"negative"} \tab Number of negative events. \cr
+	\code{"n"} \tab Total number of events. \cr
+	\code{"count"} \tab Total number of events. \cr
+}
+Note that with \code{what = "n"} or \code{what = "count"},
 the \code{excluded} option is ignored.
 }

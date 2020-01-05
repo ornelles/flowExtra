@@ -9,7 +9,7 @@ peakNormalize(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
   range.search = c(50, 500), scale = FALSE, ...)
 }
 \arguments{
-\item{fs}{A \code{flowSet} with data to be transfomred in channel in \code{chan}}
+\item{fs}{A \code{flowSet} with data to be transformed in channel in \code{chan}}
 
 \item{peaks}{An optional matrix of "G1" and "G2" peak values \emph{or} a
 vector "G1" values. The default value of \code{NULL} will use
@@ -32,7 +32,7 @@ will the the original limits of the data. If \code{FALSE} the range will be
 \code{-Inf} to \code{+Inf}.}
 
 \item{range.search}{A numeric vector of length 2 specifying the range
-of values in the orignal data in which peaks will be accepted. The
+of values in the original data in which peaks will be accepted. The
 default value of \code{c(50, 500)} is meant to ignore apoptotic values and
 polyploid peaks}
 

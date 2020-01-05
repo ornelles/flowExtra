@@ -9,20 +9,21 @@ locator2(n = 512, type = c("dot", "v", "h", "both", "none"), ...)
 \arguments{
 \item{n}{The maximum number of points to locate}
 
-\item{type}{One of \code{"dot", "v", "h", "both"} or \code{
-"none"} to add a point, vertical line, horizontal line, or
-both vertical and horizontal lines at each selected point}
+\item{type}{One of \code{"dot", "v", "h", "both"} or 
+\code{"none"} to add a point, vertical line, horizontal line,
+both vertical and horizontal lines, or no mark at each selected
+point}
 
-\item{...}{Additional graphic parameters passed to either \
-code{\link{panel.points}} or \code{\link{panel.abline}} if \
-code{type != "none"}}
+\item{...}{Additional graphic parameters passed to either
+\code{\link{panel.points}} or \code{\link{panel.abline}} if
+\code{type != "none"}}
 }
 \value{
 A list containing \code{x} and \code{y} coordinates of the
 identified points in the user coordinate system.
 }
 \description{
-Reads the position of the grapics cursor from a lattice panel
+Reads the position of the graphics cursor from a lattice panel
 }
 \details{
 This provides a functional replacement for

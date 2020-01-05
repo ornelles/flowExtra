@@ -2,63 +2,72 @@
 % Please edit documentation in R/linearGate.R
 \name{linearGate}
 \alias{linearGate}
-\title{Fit Gate for Single Cells}
+\title{Create Gate for Single Cells}
 \usage{
 linearGate(x, xchan = "FL2.A", ychan = "FL2.H",
-  zero.intercept = TRUE, dx = 0.06, dy = dx, xrange = NULL,
-  yrange = NULL, cutoff = 0.02, limit.gate = FALSE,
-  filterId = "singlets", groupFilterId = "linearGateList")
+  zero.intercept = TRUE, dx = 0.06, dy = dx, xRange = NULL,
+  gRange = TRUE, filterId = "singlets",
+  groupFilterId = "singletsGateList")
 }
 \arguments{
-\item{x}{Data to fit as either a matrix from \code{\link[Biobase]{exprs}},
-a \code{flowFrame}, or a \code{flowSet}}
+\item{x}{Either a matrix from \code{\link[Biobase]{exprs}}, a
+\code{flowFrame}, or a \code{flowSet}}
 
-\item{xchan, ychan}{Character strings to define single cells, default
-values of \code{"FL2.A"} and \code{"FL2.H"}}
+\item{xchan, ychan}{Character strings identifying the data to search for
+single cells with default values of \code{"FL2.A"} and \code{"FL2.H"}}
 
-\item{zero.intercept}{If \code{TRUE} (default), force regression through
-origin}
+\item{zero.intercept}{If \code{TRUE} (the default), the regression used
+to identify the singlets will be forced through the origin}
 
-\item{dx, dy}{Width and height of rectangular gate, default value of 0.06.
-If only \code{dx} is specified, \code{dy} will be assigned the same value}
+\item{dx, dy}{The width and height of rectangular gate, with a default
+value of 0.06. If only \code{dx} is specified, \code{dy} will be
+assigned the same value as \code{dx}}
 
-\item{xrange, yrange}{If \code{NULL}, regression will be limited to
-values within the 2.5 - 97.5 percentile, otherwise in the specified
-range of values}
+\item{xRange}{A numeric value of length two to specify the upper and
+lower percentile range of the data in \code{xchan} to be used for the
+regression. If \code{NULL}, a default value of \code{c(0.025, 0.975)}
+will be used}
 
-\item{cutoff}{Numeric value between 0 and 1 specifying the fraction of
-low and high values to ignore in the regression, default value of 0.02}
-
-\item{limit.gate}{Logical value (default of \code{FALSE}) to limit the
-returned gate by the values in \code{xrange} and \code{yrange}}
+\item{gRange}{A \code{logical} value \emph{or} a numeric vector of length
+2 to specify limits on the dimension of the returned gate. The limits
+can be specified by quantiles or absolute values. See the Details
+section for more information}
 
 \item{filterId}{Character string with default value of \code{"singlets"}}
 
-\item{groupFilterId}{Character string with default value of \code{
-"linearGateList"}}
+\item{groupFilterId}{Character string with default value of
+\code{"singletsGateList"}}
 }
 \value{
 A rectangular \code{polygonGate} or list of these gates.
 }
 \description{
-Fit a rectangular polygon gate for single cells in FL2.A x FL2.H
+Fit a narrow rectangular gate to select single cells in a 2-D
+plot of area x height
 }
 \details{
-This function fits values in \code{xchan} and \code{ychan} to a robust
-linear regression with \code{\link[MASS]{lqs}}. Note that default names
-for the x & y channels are "FL2.A" and "FL2.H" and \strong{not} "FL2-A"
-and "FL2-H". If \code{zero.intercept} is \code{TRUE}, the fit is forced
-through origin. The regression will be limited to values within the
-2.5 to 97.5 percentile if \code{xrange} and \code{yrange} is \code{NULL}.
-A different range can be specified with these arguments.
+This function creates a data-driven gate to select single cells from
+\code{area} and \code{height} values collected on a linear scale. A
+robust linear regression is fit to the data with
+\code{\link[MASS]{lqs}}. This regression is used to create a narrow
+rectangular gate centered about the single cells. If
+\code{zero.intercept = TRUE}, the regression is forced through origin.
+By default, the regression is applied to values within the 2nd to 98th
+percentile of data in channel \code{xchan}. Other percentiles can be
+specified with the argument \code{xRange}.
 
-The argument \code{x} can be a matrix from \code{\link[Biobase]{exprs}},
-a \code{flowFrame}, or a \code{flowSet}. A recantgular polygon gate (or
-list of gates) with a width and height of \code{dx} and \code{dy} will
-be returned. If \code{limit.gate} is \code{TRUE}, the returned gate will
-also be limited by the values in \code{xrange} and \code{yrange}.
-Otherwise, the gate will be limited by the range of values in each
-flowFrame up to limits set by \code{cutoff} and the maximum range of
-values in the x channel (FL2.A) limited to \code{cutoff * maxRange} and
-\code{(1 - cutoff) * maxRange}.
+The resulting \code{polygonGate(s)} will be limited to the range of
+values specified by \code{gRange}. If \code{gRange = TRUE}, the gate
+will be limited to the 2.5 to 97.5 percentile of data in
+channel \code{xchan}. If \code{gRange = FALSE}, the gate will
+span the full range of data. If \code{gRange} is a numeric vector of
+values less than or equal to 1, \code{gRange} will be treated as
+the percentiles to limit the gate. If \code{gRange} is a numeric
+vector with values greater than 1, \code{gRange} will be
+interpreted as the lower and upper limits of the gate in the \code{xchan}
+dimension.
+
+Since this is typically used for cell cycle analysis with DNA
+content, the default parameters are \code{xchan = "FL2.A"} and
+\code{ychan = "FL2.H"}
 }

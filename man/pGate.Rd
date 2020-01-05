@@ -26,7 +26,7 @@ A \code{polygonGate} or \code{ellipsoidGate} object is returned of the
 same dimensions as the active lattice graph.
 }
 \description{
-Interact with lattice plot to define a gate
+Interact with lattice flow plot to define a gate
 }
 \details{
 This function is called after an \code{xyplot} of flow data in order
@@ -50,6 +50,6 @@ required since partial matching is used to assign the value.
 }
 
 The implementation of \code{\link{ellipsoidGate}} does not seem to honor 
-the covariance parameters, so the distance parameter has been arbitrarily  
+the covariance parameter, so the distance parameter has been arbitrarily  
 adjusted by the square root of 2 to make up for this quirk.
 }
