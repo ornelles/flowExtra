@@ -4,17 +4,10 @@
 \alias{linearGate}
 \title{Create Gate for Single Cells}
 \usage{
-linearGate(
-  x,
-  xchan = "FL2.A",
-  ychan = "FL2.H",
-  zero.intercept = TRUE,
-  width = 0.05,
-  xRange = NULL,
-  gRange = TRUE,
-  filterId = "singlets",
-  groupFilterId = "singletsGateList"
-)
+linearGate(x, xchan = "FL2.A", ychan = "FL2.H",
+  zero.intercept = TRUE, width = 0.05, xRange = NULL,
+  gRange = TRUE, filterId = "singlets",
+  groupFilterId = "singletsGateList")
 }
 \arguments{
 \item{x}{Either a matrix from \code{\link[Biobase]{exprs}}, a
@@ -26,9 +19,10 @@ single cells with default values of \code{"FL2.A"} and \code{"FL2.H"}}
 \item{zero.intercept}{If \code{TRUE} (the default), the regression used
 to identify the singlets will be forced through the origin}
 
-\item{width}{The width of the rotated rectangular gate as a fraction
-of the instrument data range for the \code{xchan} parameter,
-with a default value of 5 \% (0.05)}
+\item{width}{The width of the rotated rectangular gate \emph{either}
+as a fraction of the \strong{instrument data range} for the
+\code{xchan} parameter \emph{or}, if greater than 1, the absolute width
+of the gate in the same units as \code{xchan}}
 
 \item{xRange}{A numeric value of length two to specify the upper and
 lower percentile range of the data in \code{xchan} to be used for the
@@ -59,8 +53,8 @@ robust linear regression is fit to the data with
 \code{\link[MASS]{lqs}}. This regression is used to create a narrow
 rectangular gate centered about the single cells. If
 \code{zero.intercept = TRUE}, the regression is forced through origin.
-By default, the regression is applied to values within the 2nd to 98th
-percentile of data in channel \code{xchan}. Other percentiles can be
+By default, the regression is applied to values within the 2.5 to 98.5
+percentiles of data in channel \code{xchan}. Other percentiles can be
 specified with the argument \code{xRange}.
 
 The resulting \code{polygonGate(s)} will be limited to the range of

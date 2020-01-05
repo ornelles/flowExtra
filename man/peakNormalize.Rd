@@ -4,18 +4,9 @@
 \alias{peakNormalize}
 \title{Translate and Scale G1 and G2 Peaks}
 \usage{
-peakNormalize(
-  fs,
-  peaks = NULL,
-  g1 = 200,
-  g2 = g1 * ratio,
-  ratio = 1.9,
-  chan = "FL2.A",
-  limits = c(0, 1023),
-  range.search = c(50, 500),
-  scale = FALSE,
-  ...
-)
+peakNormalize(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
+  ratio = 1.9, chan = "FL2.A", limits = c(0, 1023),
+  range.search = c(50, 500), scale = FALSE, ...)
 }
 \arguments{
 \item{fs}{A \code{flowSet} with data to be transformed in channel in \code{chan}}
