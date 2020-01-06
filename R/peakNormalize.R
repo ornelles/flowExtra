@@ -112,6 +112,10 @@ peakNormalize <- function(fs, peaks = NULL, g1 = 200, g2 = g1 * ratio,
 	x <- Subset(fs, TRUE)
 # act only on non-NA G1 peaks
 	sel <- which(!is.na(peaks[, 1]))
+###
+### NO - must scale by multiplying. Perhaps only G1 peak should
+### be adjusted!! Scale option should be for only G1 or both G1/G2
+###
 # translate and (optionally) scale data
 	for (i in sel) {
 		v <- exprs(x[[i]])[, chan]
