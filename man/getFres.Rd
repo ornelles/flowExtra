@@ -78,3 +78,16 @@ The specific statistic can be specified by the character value in
 Note that with \code{what = "n"} or \code{what = "count"},
 the \code{excluded} option is ignored.
 }
+\examples{
+ fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+ fs <- fs[c(3, 7, 11, 15)]
+ res <- filter(fs, norm2Filter("FSC.H", "SSC.H", scale.factor = 2))
+ xyplot(SSC.H ~ FSC.H, fs, filter = res, stats = TRUE)
+ getFres(res, as.percent = TRUE)
+ getFres(res) # default format
+ getFres(res, "n")
+ getFres(res, "true")
+ getFres(res, "negative")
+ getFres(res, "p", as.percent = TRUE, excluded = TRUE)
+ 
+}

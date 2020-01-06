@@ -11,14 +11,15 @@
 #' this is `NULL`, the [flowStats::curv1Filter()] function will be used 
 #' with optional arguments (`bwFac` or `gridsize`) passed in `...`.
 #' 
-#' By default, peaks are accepted in the range defined by the 5th to 95th
-#' percentile or to the percentile values specified in `probs`. For
-#' well-behaved data, this can be set to `c(50, 500)` to exclude apoptotic
-#' populations and populations greater than G2/M. If no more than two peaks
+#' If `range.search` is `NULL`, peaks are found accepted in the range of data
+#' spanning  5th to 95th percentile or to the percentile values specified in
+#' `probs`. For well-behaved data, `range.search` can be set to `c(50, 500)` to
+#' exclude apoptotic and polyploid populations.
+#' If no more than two peaks
 #' are found, they will be labeled `"G1"` and `"G2"`. A single peak will be
-#' labeled as `"G1"` with an `NA` for the second peak, labeled as `"<G2>"`.
-#' If more than two peaks are found, the peaks will be labeled as 
-#' `"peak1"`, `"peak2"`, `"peak3"`, etc.
+#' labeled as `"G1"` with a  value of `NA` for the second peak, which will
+#' be labeled as `"<G2>"`. If more than two peaks are found, the peaks will be
+#' labeled as `"peak1"`, `"peak2"`, `"peak3"`, etc.
 #'
 #' @param x A `flowFrame` or `flowSet` with the parameter named in `chan`
 #' @param curveFilter An optional function that returns a `multipleFilterResult`
@@ -43,6 +44,11 @@
 #' An 1-D or 2-D array with rownames obtained from [flowCore::identifier()]
 #' and column names determined as described above.
 #' 
+#' @examples 
+#'  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+#'  findPeaks(fs) # find all by default
+#'  findPeaks(fs, range.search = c(50, 500)) # find probable G1 and G2
+#'
 #' @import flowCore flowStats
 #' 
 #' @export

@@ -48,12 +48,19 @@ of high density are identified by the function defined in \code{curveFilter}. If
 this is \code{NULL}, the \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} function will be used
 with optional arguments (\code{bwFac} or \code{gridsize}) passed in \code{...}.
 
-By default, peaks are accepted in the range defined by the 5th to 95th
-percentile or to the percentile values specified in \code{probs}. For
-well-behaved data, this can be set to \code{c(50, 500)} to exclude apoptotic
-populations and populations greater than G2/M. If no more than two peaks
+If \code{range.search} is \code{NULL}, peaks are found accepted in the range of data
+spanning  5th to 95th percentile or to the percentile values specified in
+\code{probs}. For well-behaved data, \code{range.search} can be set to \code{c(50, 500)} to
+exclude apoptotic and polyploid populations.
+If no more than two peaks
 are found, they will be labeled \code{"G1"} and \code{"G2"}. A single peak will be
-labeled as \code{"G1"} with an \code{NA} for the second peak, labeled as \code{"<G2>"}.
-If more than two peaks are found, the peaks will be labeled as
-\code{"peak1"}, \code{"peak2"}, \code{"peak3"}, etc.
+labeled as \code{"G1"} with a  value of \code{NA} for the second peak, which will
+be labeled as \code{"<G2>"}. If more than two peaks are found, the peaks will be
+labeled as \code{"peak1"}, \code{"peak2"}, \code{"peak3"}, etc.
+}
+\examples{
+ fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+ findPeaks(fs) # find all by default
+ findPeaks(fs, range.search = c(50, 500)) # find probable G1 and G2
+
 }

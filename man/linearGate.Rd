@@ -75,3 +75,11 @@ Since this is typically used for cell cycle analysis with DNA
 content, the default parameters are \code{xchan = "FL2.A"} and
 \code{ychan = "FL2.H"}
 }
+\examples{
+ fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+ lg <- linearGate(fs) # default settings
+ xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg[1:4], stats = TRUE)
+ lg2 <- linearGate(fs, width = 0.02, gRange = c(75, 750))
+ xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg2[1:4], stats = TRUE)
+
+}

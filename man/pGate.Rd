@@ -31,9 +31,9 @@ Interact with lattice flow plot to define a gate
 \details{
 This function is called after an \code{xyplot} of flow data in order
 to define a gate. 
-The user will select a panel, which will be redrawn and used to select
+The user will select a panel that will be redrawn and used to select
 points that define the gate for the data in the remaining panels
-(flow set).
+(`flowSet`).
 The type of gate is specific by the argument \code{type} and can be
 one of the following character strings. Only the first letter is
 required since partial matching is used to assign the value.

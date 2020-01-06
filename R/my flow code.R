@@ -25,12 +25,11 @@
 # fs <- Subset(fs, boundaryFilter("FL2.A"))
 # lg <- linearGate(fs)
 # fs2 <- Subset(fs, lg)
-# fs3 <- peakNormalize(fs2, g1 = 170)
+# fs3 <- peakAdjust(fs2, g1 = 170)
 # dnaplot(sample ~ FL2.A, fs, main = "Raw data", xlim = c(0, 500))
 # dnaplot(sample ~FL2.A, fs2, main = "Singlets", xlim = c(0, 500))
 # dnaplot(sample ~FL2.A, fs3, main = "Correct G1 aligned", xlim = c(0, 500))
-# fs4 <- peakNormalize(fs2, g1 = 170, scale = TRUE)
-# dnaplot(sample ~FL2.A, fs4, main = "Incorrect use of 'scale = TRUE'", xlim = c(0, 500)) 
+# 
 #
 # extract ellipsoid gate parameters from filter result for drawing or calculating
 # example:

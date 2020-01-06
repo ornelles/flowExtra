@@ -22,7 +22,8 @@
 #'   the argument \code{log.chan} is \code{NULL}, defaults to \code{2^depth}
 #' @param ...	Additional arguments to \code{\link[flowCore]{read.flowSet}}
 #'
-#' @details Files in the directory specified by \code{path} that match 
+#' @details
+#' Files in the directory specified by \code{path} that match 
 #' the \code{grep} pattern specified in \code{pattern} will be read with
 #' \code{\link{read.flowSet}}. Parameter names will be adjusted if
 #' \code{alter.names = TRUE} to replace \code{"-"} with \code{"."}. A 

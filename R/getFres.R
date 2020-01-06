@@ -52,6 +52,18 @@
 #' @param fmt Character format string for \code{\link{sprintf}} if the
 #'    argument \code{as.percent = TRUE}
 #'
+#' @examples
+#'  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+#'  fs <- fs[c(3, 7, 11, 15)]
+#'  res <- filter(fs, norm2Filter("FSC.H", "SSC.H", scale.factor = 2))
+#'  xyplot(SSC.H ~ FSC.H, fs, filter = res, stats = TRUE)
+#'  getFres(res, as.percent = TRUE)
+#'  getFres(res) # default format
+#'  getFres(res, "n")
+#'  getFres(res, "true")
+#'  getFres(res, "negative")
+#'  getFres(res, "p", as.percent = TRUE, excluded = TRUE)
+#'  
 #' @return
 #' For \code{getFres}: a numeric vector of the desired statistic \emph{or}
 #' a character string formatted as the percent of positive or negative events.

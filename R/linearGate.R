@@ -3,7 +3,8 @@
 #' Fit a narrow rectangular gate to select single cells in a 2-D
 #' plot of \code{area} x \code{height}
 #'
-#' @details#' This function creates a data-driven gate to select single cells from
+#' @details
+#' This function creates a data-driven gate to select single cells from
 #' \code{area} and \code{height} values collected on a linear scale. A
 #' robust linear regression is fit to the data with
 #' \code{\link[MASS]{lqs}}. This regression is used to create a narrow
@@ -55,6 +56,13 @@
 #'
 #' @return
 #' A rectangular \code{polygonGate} or list of these gates.
+#'
+#' @examples
+#'  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+#'  lg <- linearGate(fs) # default settings
+#'  xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg[1:4], stats = TRUE)
+#'  lg2 <- linearGate(fs, width = 0.02, gRange = c(75, 750))
+#'  xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg2[1:4], stats = TRUE)
 #'
 #' @import flowCore
 #' @importFrom MASS lqs

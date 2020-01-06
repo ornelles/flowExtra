@@ -4,7 +4,7 @@
 \alias{dnaplot}
 \title{Densityplot for DNA Profiles}
 \usage{
-dnaplot(..., adjust = 0.2, n = 512)
+dnaplot(..., adjust = 0.2, n = 512, plot = TRUE)
 }
 \arguments{
 \item{...}{Arguments to be handed to \code{\link[flowViz:densityplot]{flowViz::densityplot()}}}
@@ -15,10 +15,14 @@ density function \code{\link[stats:density]{stats::density()}}, decreased from 1
 \item{n}{The number of equally spaced points at which the density is to
 be estimated, increased from 50 to 512}
 
+\item{plot}{If \code{TRUE}, lattice object will be plotted as well as
+being returned as an \code{invisible} object}
+
 \item{data}{\code{flowFrame} or \code{flowSet} with data}
 }
 \value{
-Plot the data and invisibly return the lattice object.
+Optionally plot the data as a side-effect and invisibly
+return the lattice plot.
 }
 \description{
 A wrapper for \code{\link[flowViz:densityplot]{flowViz::densityplot()}} with defaults for
@@ -32,4 +36,9 @@ typical DNA profiles. Specifically, the optional arguments to
 
 The call effectively executes the following:\preformatted{  densityplot(..., dargs = list(adjust = adjust, n = n))
 }
+}
+\examples{
+ fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+ dnaplot(~ FL2.A, fs) # unadjusted values
+
 }

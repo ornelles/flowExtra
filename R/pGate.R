@@ -14,9 +14,9 @@
 #' @details
 #' This function is called after an \code{xyplot} of flow data in order
 #' to define a gate. 
-#' The user will select a panel, which will be redrawn and used to select
+#' The user will select a panel that will be redrawn and used to select
 #' points that define the gate for the data in the remaining panels
-#' (flow set).
+#' (`flowSet`).
 #' The type of gate is specific by the argument \code{type} and can be
 #' one of the following character strings. Only the first letter is
 #' required since partial matching is used to assign the value.
@@ -61,14 +61,14 @@ pGate <- function(type = c("arbitrary", "parallel", "convex", "ellipse"),
 
 	type <- match.arg(type)
 
-	if (type == "arbitrary" | type == "convex hull" | type == "ellipse") {
+	if (type == "arbitrary" | type == "convex" | type == "ellipse") {
 		p <- matrix(numeric(0), ncol = 2)
 		while(!is.null(gp <- grid::grid.locator())) {
 			do.call(panel.points, args = list(gp, cex = 0.5))
 			p <- rbind(p, c(grid::convertX(gp$x, "native", TRUE),
 					grid::convertY(gp$y, "native", TRUE)))
 		}
-		if (type == "convex hull") {
+		if (type == "convex") {
 			idx <- chull(p)
 			bd <- p[idx,]
 		}

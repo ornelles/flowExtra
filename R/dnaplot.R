@@ -10,6 +10,8 @@
 #'   density function [stats::density()], decreased from 1 to 0.2
 #' @param n The number of equally spaced points at which the density is to
 #'   be estimated, increased from 50 to 512
+#' @param plot If `TRUE`, lattice object will be plotted as well as 
+#'   being returned as an `invisible` object
 #'
 #' @details
 #' This is a convenience function with parameters more suited for
@@ -22,18 +24,25 @@
 #'   densityplot(..., dargs = list(adjust = adjust, n = n))
 #' ```
 #' 
-#' @return Plot the data and invisibly return the lattice object.
+#' @return
+#' Optionally plot the data as a side-effect and invisibly
+#' return the lattice plot.
 #' 
+#' @examples 
+#'  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+#'  dnaplot(~ FL2.A, fs) # unadjusted values
+#'
 #' @import flowViz
 #'
 #' @export
 #'
-dnaplot <- function(..., adjust = 0.2, n = 512)
+dnaplot <- function(..., adjust = 0.2, n = 512, plot = TRUE)
 {
 	dots <- list(...)
 	darg <- list(adjust = adjust, n = n)
 	argList <- c(dots, darg = list(darg))
 	obj <- do.call(flowViz::densityplot, args = argList)
-	plot(obj)
+	if (plot == TRUE)
+		plot(obj)
 	invisible(obj)
 }
