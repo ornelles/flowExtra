@@ -4,10 +4,18 @@
 \alias{readSet}
 \title{Read and Transform Flow Set}
 \usage{
-readSet(path = ".", pattern = "\\\\d\\\\d\\\\d$", log.chan = NULL,
-  alter.names = TRUE, name.keyword = "SAMPLE ID",
+readSet(
+  path = ".",
+  pattern = "\\\\d\\\\d\\\\d$",
+  log.chan = NULL,
+  alter.names = TRUE,
+  name.keyword = "SAMPLE ID",
   phenoData = list(date = "$DATE", sample = "SAMPLE ID"),
-  tfun = c("asinh", "log10"), depth = 10, log.cutoff = 2^depth, ...)
+  tfun = c("asinh", "log10"),
+  depth = 10,
+  log.cutoff = 2^depth,
+  ...
+)
 }
 \arguments{
 \item{path}{A character vector identifying the path to search for FSC

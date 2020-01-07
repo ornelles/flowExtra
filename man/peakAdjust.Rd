@@ -4,8 +4,16 @@
 \alias{peakAdjust}
 \title{Translate and Scale Linear Data}
 \usage{
-peakAdjust(fs, peaks, g1 = 200, ratio = 1.92, chan = "FL2.A",
-  limits = NULL, range.search = c(50, 500), ...)
+peakAdjust(
+  fs,
+  peaks,
+  g1 = 200,
+  ratio = 1.92,
+  chan = "FL2.A",
+  limits = NULL,
+  range.search = c(50, 500),
+  ...
+)
 }
 \arguments{
 \item{fs}{A \code{flowSet} with data to be transformed in channel in \code{chan}}
@@ -50,14 +58,14 @@ is provided in the optional argument \code{peaks}. This can either be a
 vector of "G1" peak positions or a matrix of "G1" and "G2/M" peak
 positions. A larger matrix will be accepted, such as one produced
 with \code{\link[=peakFind]{peakFind()}}, but only the first two columns will be used and
-treated as "G1" and "G2" positions, respectively. Missing values in
+treated as "G1" and "G2/M" positions, respectively. Missing values in
 "G1" that have a "G2/M" value will be replaced by a value derived
 from \code{ratio}. If the argument \code{peaks} is missing, the function
 \code{\link[=peakFind]{peakFind()}} will be called with arguments \code{range.search} and \code{...}
 to identify the peaks.
 
 Transformed values will be trimmed to the range specified by
-\code{limits}, uses the instrument range for \code{chan} if \code{limits = NULL}.
+\code{limits} or the instrument range for \code{chan} if \code{limits = NULL}.
 No trimming will occur if \code{limits = FALSE}.
 }
 \examples{

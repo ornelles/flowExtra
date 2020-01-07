@@ -4,10 +4,17 @@
 \alias{linearGate}
 \title{Create Gate for Single Cells}
 \usage{
-linearGate(x, xchan = "FL2.A", ychan = "FL2.H",
-  zero.intercept = TRUE, width = 0.05, xRange = NULL,
-  gRange = TRUE, filterId = "singlets",
-  groupFilterId = "singletsGateList")
+linearGate(
+  x,
+  xchan = "FL2.A",
+  ychan = "FL2.H",
+  zero.intercept = TRUE,
+  width = 0.05,
+  xRange = NULL,
+  gRange = TRUE,
+  filterId = "singlets",
+  groupFilterId = "singletsGateList"
+)
 }
 \arguments{
 \item{x}{Either a matrix from \code{\link[Biobase]{exprs}}, a

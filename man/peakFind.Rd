@@ -4,8 +4,15 @@
 \alias{peakFind}
 \title{Find G1 and G2 peaks}
 \usage{
-peakFind(x, curveFilter = NULL, chan = "FL2.A", searchFun = NULL,
-  range.search = NULL, probs = c(0.05, 0.95), ...)
+peakFind(
+  x,
+  curveFilter = NULL,
+  chan = "FL2.A",
+  searchFun = NULL,
+  range.search = NULL,
+  probs = c(0.05, 0.95),
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{flowFrame} or \code{flowSet} with the parameter named in \code{chan}}
@@ -27,7 +34,7 @@ limits the search to the range defined by the quantiles specified
 in \code{probs}}
 
 \item{probs}{Numeric vector of length 2 defining the lower and upper
-quantiles for valid peak values, the default value of 5 to 95\%
+quantiles for valid peak values, the default value of 5 to 95\\%
 is specified by the argument \code{probs = c(0.05, 0.95)}}
 
 \item{...}{Additional arguments to be passed to

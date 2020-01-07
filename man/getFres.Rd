@@ -5,9 +5,14 @@
 \alias{get.p}
 \title{Extract a Filter Result}
 \usage{
-getFres(x, filter, what = c("p", "true", "count", "n", "positive",
-  "negative"), as.percent = FALSE, excluded = FALSE,
-  fmt = "\%4.1f\%\%")
+getFres(
+  x,
+  filter,
+  what = c("p", "true", "count", "n", "positive", "negative"),
+  as.percent = FALSE,
+  excluded = FALSE,
+  fmt = "\%4.1f\%\%"
+)
 
 get.p(x, filter, as.percent = FALSE, excluded = FALSE)
 }

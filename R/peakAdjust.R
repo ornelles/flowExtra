@@ -14,7 +14,7 @@
 #' vector of "G1" peak positions or a matrix of "G1" and "G2/M" peak
 #' positions. A larger matrix will be accepted, such as one produced
 #' with [peakFind()], but only the first two columns will be used and
-#' treated as "G1" and "G2" positions, respectively. Missing values in
+#' treated as "G1" and "G2/M" positions, respectively. Missing values in
 #' "G1" that have a "G2/M" value will be replaced by a value derived
 #' from `ratio`. If the argument `peaks` is missing, the function
 #' [peakFind()] will be called with arguments `range.search` and `...`
@@ -22,7 +22,7 @@
 #'
 #'
 #' Transformed values will be trimmed to the range specified by
-#' `limits`, uses the instrument range for `chan` if `limits = NULL`.
+#' `limits` or the instrument range for `chan` if `limits = NULL`.
 #' No trimming will occur if `limits = FALSE`.
 #'
 #' @param fs A `flowSet` with data to be transformed in channel in `chan`
