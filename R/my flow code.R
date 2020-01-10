@@ -12,8 +12,7 @@
 ###
 ## Shift G1 peak without using peakNormalize
 ##
-# library(flowExtra)
-# flowViz.par.set(theme = trellis.par.get(), reset = TRUE)
+# library(flowExtra) # flowViz.par.set(theme = trellis.par.get(), reset = TRUE)
 # dropbox <- if (.Platform$OS.type == "unix") "~/Dropbox" else "~/../Dropbox"
 # path <- file.path(dropbox, "/docs/flow/2011 data/2011_0124 rpe1 synch roberta")
 # fs <- readSet(path)
