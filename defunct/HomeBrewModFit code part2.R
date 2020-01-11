@@ -16,8 +16,8 @@ f <- function(x, a, b, m1, s1, m2, s2) {
 }
 
 d <- density(exprs(fs[[16]][,"FL2.A"]), adj = 0.5, n = 1024)
-pks <- peakFind(fs[[16]])[1:2]
-start <- list(a = 0.5, b = 0.5, m1 = pks[1], s1 = 10, m2 = pks[2], s2 = 10)
+peaks <- peakFind(fs[[16]])[1:2]
+start <- list(a = 0.5, b = 0.5, m1 = peaks[1], s1 = 10, m2 = peaks[2], s2 = 10)
 fm <- nls(y ~ fun(x, a, b, m1, s1, m2, s2), data.frame(x = d$x, y = d$y), 
 	start = start, algorithm = "port")
 coef(fm)
@@ -71,11 +71,22 @@ fun <- function(x, mean, sigma = NULL, lambda = NULL, cv = 0.05)
 
 #
 # works with high quality starting parameters, use other algorithms if need be
+# tweak bwFac for best peak discrimination
 #
-fmx <- nls(y ~ fun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
-	start = list(mean = pks[1,], sigma = c(5, 8), lambda = c(0.7,0.3)))
+peaks <- peakFind(fs, bwFac = 2)[,1:2]
+par(ask = TRUE)
+for (i in 1:16) {
+	d <- density(exprs(fs[[i]][,"FL2.A"]), adj = 0.5, n = 1024)
+	myPeaks <- peaks[i,]
+	n <- sum(sel)
+	fmx <- nls(y ~ fun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
+		start = list(mean = myPeaks, sigma = rep(5, 2), lambda = rep(0.3, 2)))
+	plot(d)
+	lines(d$x, predict(fmx), col = 2)
+}
 
 ## Works!
 #
 # fold into function to convert FL2.A values to density, fit, return labda
 # values and "inter-peak" fraction
+
