@@ -73,14 +73,22 @@ fun <- function(x, mean, sigma = NULL, lambda = NULL, cv = 0.05)
 # works with high quality starting parameters, use other algorithms if need be
 # tweak bwFac for best peak discrimination
 #
-peaks <- peakFind(fs, bwFac = 2)[,1:2]
+# The better bandwidth selection for these data-rich density plots is NOT
+# the default, "nrd0". Rather the method of Sheather and Jones implemented by
+# Venables and Ripley and then folded into R >= 3.4.0 is bw.SJ(). The default
+# method yields an overly smooth estimate for areas of high density, the SJ
+# is best for all data and large amounts of data. 
+#
+# May need to adjust logic in peakFind()
+#
+peaks <- peakFind(fs)[,1:2]
 par(ask = TRUE)
 for (i in 1:16) {
 	d <- density(exprs(fs[[i]][,"FL2.A"]), adj = 0.5, n = 1024)
 	myPeaks <- peaks[i,]
 	n <- sum(sel)
 	fmx <- nls(y ~ fun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
-		start = list(mean = myPeaks, sigma = rep(5, 2), lambda = rep(0.3, 2)))
+		start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(1, n)))
 	plot(d)
 	lines(d$x, predict(fmx), col = 2)
 }
