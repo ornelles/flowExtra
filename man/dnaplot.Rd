@@ -4,21 +4,27 @@
 \alias{dnaplot}
 \title{Densityplot for DNA Profiles}
 \usage{
-dnaplot(..., adjust = 0.2, n = 512, plot = TRUE)
+dnaplot(
+  ...,
+  darg = list(bw = "SJ", n = 512, adjust = 1),
+  chan = NULL,
+  plot = TRUE
+)
 }
 \arguments{
-\item{...}{Arguments to be handed to \code{\link[flowViz:densityplot]{flowViz::densityplot()}}}
+\item{...}{Arguments to be handed to \code{\link[flowViz:densityplot]{flowViz::densityplot()}} \emph{or}
+a \code{flowFrame} or \code{flowSet}}
 
-\item{adjust}{Numeric factor to adjust the bandwith in the kernel
-density function \code{\link[stats:density]{stats::density()}}, decreased from 1 to 0.2}
+\item{darg}{List of arguments passed to the kernel density function
+\code{\link[stats:density]{stats::density()}} to increase the resolution of the plot. In
+addition to \code{bw}, these can include \code{adjust}, \code{n}. The option
+\code{na.rm = TRUE} will be included in all cases}
 
-\item{n}{The number of equally spaced points at which the density is to
-be estimated, increased from 50 to 512}
+\item{chan}{An option character scalar identifying the data to be
+plotted if \code{...} is a \code{flowFrame} or \code{flowSet}}
 
 \item{plot}{If \code{TRUE}, lattice object will be plotted as well as
 being returned as an \code{invisible} object}
-
-\item{data}{\code{flowFrame} or \code{flowSet} with data}
 }
 \value{
 Optionally plot the data as a side-effect and invisibly
@@ -30,15 +36,30 @@ DNA profiles.
 }
 \details{
 This is a convenience function with parameters more suited for
-typical DNA profiles. Specifically, the optional arguments to
-\code{\link[stats:density]{stats::density()}}, which are provided in \code{darg}, are changed from
-\code{n = 50} and \code{adjust = 1} to \code{n = 512} and \code{adjust = 0.2}.
+typical DNA profiles by using the bandwidth algorithm of Sheather
+& Jones in \code{bw.SJ} with the adjustment in \code{adjust} and using more
+points (512 rather than 50) to determine the density. These additional
+parameters are passed to \code{\link[stats:density]{stats::density()}}, which in \code{darg}.
 
-The call effectively executes the following:\preformatted{  densityplot(..., dargs = list(adjust = adjust, n = n))
+The call effectively executes the following:\preformatted{  densityplot(..., dargs = dargs)
+}
+
+... \strong{except} for the \emph{lazy} case of calling it with first argument a
+\code{flowSet} or \code{flowFrame}. In this case the function guesses
+the most likely \code{chan} parameter (in order) from \verb{FL2.A, FL3.A, FL2.H}
+or \code{FL3.H}. Alternatively, the channel name can be passed in \code{chan} and
+the call now becomes:\preformatted{  densityplot(~ chan, ..., dargs = dargs)
 }
 }
 \examples{
- fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
- dnaplot(~ FL2.A, fs) # unadjusted values
+# load and filter example data with 16 flowFrames
+  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+  fs <- Subset(fs, boundaryFilter("FL2.A"))
+# default density parameters from flowViz 
+  dnaplot(~ FL2.A, fs, xlim = c(50, 500), darg = NULL, main = "Original")
+# revised density parameters 
+  dnaplot(~ FL2.A, fs, xlim = c(50, 500), main = "Revised")
+# lazy use...
+  dnaplot(fs)
 
 }

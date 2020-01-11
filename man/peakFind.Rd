@@ -2,68 +2,65 @@
 % Please edit documentation in R/peakFind.R
 \name{peakFind}
 \alias{peakFind}
-\title{Find G1 and G2 peaks}
+\title{Find G1 and G2/M peaks}
 \usage{
 peakFind(
   x,
-  curveFilter = NULL,
   chan = "FL2.A",
-  searchFun = NULL,
+  darg = list(bw = "nrd0", n = 512),
   range.search = NULL,
   probs = c(0.05, 0.95),
-  ...
+  bwFac = 1.2,
+  gridsize = rep(401, 2)
 )
 }
 \arguments{
 \item{x}{A \code{flowFrame} or \code{flowSet} with the parameter named in \code{chan}}
 
-\item{curveFilter}{An optional function that returns a \code{multipleFilterResult}
-defining the regions of 1-D curvature in \code{chan}. If \code{NULL}, the
-\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} will be used}
+\item{chan}{The name of the data to be evaluated in \code{x}}
 
-\item{chan}{The name of the data to be evaluated in \code{x}, default of \code{"FL2.A"}}
+\item{darg}{List of arguments passed to the kernel density estimating
+function (\code{\link[stats:density]{stats::density()}}) used to find peaks}
 
-\item{searchFun}{An optional function to determine the position of each
-peak defined by application of \code{curvFilter}. If \code{NULL}, the
-\code{\link[stats:density]{stats::density()}} function will be used with the bandwith adjusted
-by the option \code{adj = 2}}
-
-\item{range.search}{An optional numeric vector of length 2 defining the
-lower and upper limits to accept peaks. The default value of \code{NULL}
+\item{range.search}{An optional numeric vector of length 2 setting the
+range of values in \code{chan} to search for peaks. The default value of \code{NULL}
 limits the search to the range defined by the quantiles specified
 in \code{probs}}
 
 \item{probs}{Numeric vector of length 2 defining the lower and upper
-quantiles for valid peak values, the default value of 5 to 95\\%
-is specified by the argument \code{probs = c(0.05, 0.95)}}
+quantiles to set the value for \code{range.search} if not provided}
 
-\item{...}{Additional arguments to be passed to
-\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}}}
+\item{bwFac, gridsize}{Numeric values of length 1 and 2 used by
+\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} to identify regions of 1-D curvature in}
 }
 \value{
-An 1-D or 2-D array with rownames obtained from \code{\link[flowCore:identifier]{flowCore::identifier()}}
+An 2-D array with row names obtained from \code{\link[flowCore:identifier]{flowCore::identifier()}}
 and column names determined as described above.
 }
 \description{
-Find G1 and G2 (and other) peaks in FL2.A values
+Find G1 and G2/M (and other) peaks in FL2.A values
 }
 \details{
 This function identifies the probable location of the G1 and G2/M peaks
-in the \code{"FL2.A"} channel (or the channel
-specified by the argument \code{chan}) in a \code{flowFrame} or \code{flowSet}. Areas
-of high density are identified by the function defined in \code{curveFilter}. If
-this is \code{NULL}, the \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} function will be used
-with optional arguments (\code{bwFac} or \code{gridsize}) passed in \code{...}.
+in the channel identified by \code{chan} in either a \code{flowFrame} or \code{flowSet}.
+Areas of local high density are first identified by
+\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} with arguments in \code{bwFac} and \code{gridsize}.
+The values are the default values for by \code{curv1Filter()}.
+The peak location within each local area of high density is
+identified from a kernel density estimate \code{\link[stats:density]{stats::density()}} using
+arguments passed in the list \code{darg}. Peak positions are returned as
+an array of two or more columns.
 
-If \code{range.search} is \code{NULL}, peaks are found accepted in the range of data
-spanning  5th to 95th percentile or to the percentile values specified in
-\code{probs}. For well-behaved data, \code{range.search} can be set to \code{c(50, 500)} to
-exclude apoptotic and polyploid populations.
-If no more than two peaks
-are found, they will be labeled \code{"G1"} and \code{"G2"}. A single peak will be
-labeled as \code{"G1"} with a  value of \code{NA} for the second peak, which will
-be labeled as \code{"<G2>"}. If more than two peaks are found, the peaks will be
-labeled as \code{"peak1"}, \code{"peak2"}, \code{"peak3"}, etc.
+If \code{range.search} is \code{NULL}, peaks are accepted in the range of data
+spanning 5th to 95th percentile or as specified by the percentile values
+in \code{probs}. For well-behaved data, \code{range.search} can be set
+to \code{c(50, 500)} to exclude apoptotic and polyploid populations.
+
+If exactly two peaks are found, they will be labeled \code{"G1"} and \code{"G2"}.
+If one peak is found, it will be treated as the "\code{G1}" peak and
+the \code{"G2"} peak will be assigned an \code{NA} value. If more than two peaks
+are found, the peaks will be labeled as \code{"peak1"}, \code{"peak2"}, \code{"peak3"},
+etc. A warning message will report finding other than 2 peaks.
 }
 \examples{
  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
