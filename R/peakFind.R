@@ -43,11 +43,12 @@
 #' and column names determined as described above.
 #' 
 #' @examples 
-#'  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
-#'  findPeaks(fs) # find all by default
-#'  findPeaks(fs, range.search = c(50, 500)) # find probable G1 and G2
+#'  fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
+#'  peakFind(fs) # find all by default
+#'  peakFind(fs, range.search = c(50, 500)) # find probable G1 and G2
 #'
-#' @import flowCore flowStats
+#' @importFrom flowCore filter exprs fsApply
+#' @importFrom flowStats curv1Filter
 #' 
 #' @export
 #' 

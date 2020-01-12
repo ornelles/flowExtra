@@ -34,7 +34,7 @@
 #' 
 #' Flow Set with transformed and name-adjusted parameters.
 #' 
-#' @import flowCore
+#' @importFrom flowCore read.flowSet keyword transformList transform
 #'
 #' @export
 #' 
@@ -57,14 +57,14 @@ readSet <- function(path = ".", pattern = "\\d\\d\\d$", log.chan = NULL,
 	else
 		stop("unable to find suitable FACS data file with pattern: ", pattern)
 
-	fs <- flowCore::read.flowSet(path = path,
+	fs <- read.flowSet(path = path,
 			pattern = pattern,
 			alter.names = alter.names, 
 			phenoData = phenoData, ...)
-	key.names <- names(flowCore::keyword(fs[[1]]))
+	key.names <- names(keyword(fs[[1]]))
 
 # adjusted selection key to match revision of flowCore ?
-	channels <- flowCore::colnames(fs[[1]])
+	channels <- colnames(fs[[1]])
 
 	if (is.null(log.chan)) { # transform based on value
 		sel <- grep("P\\dRmax", key.names, value = TRUE)

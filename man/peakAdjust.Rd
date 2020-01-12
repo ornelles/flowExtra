@@ -6,17 +6,18 @@
 \usage{
 peakAdjust(
   fs,
+  chan = "FL2.A",
   peaks,
   g1 = 200,
   ratio = 1.92,
-  chan = "FL2.A",
   limits = NULL,
-  range.search = c(50, 500),
   ...
 )
 }
 \arguments{
 \item{fs}{A \code{flowSet} with data to be transformed in channel in \code{chan}}
+
+\item{chan}{Character vector to specify the channel to normalize (\code{"FL2.A"})}
 
 \item{peaks}{An optional matrix of "G1" and "G2/M" peak values \emph{or} a
 vector of "G1" values. If missing, \code{\link[=peakFind]{peakFind()}} to identify the peaks
@@ -27,19 +28,18 @@ within the range specified by \code{range.search}}
 \item{ratio}{G2 to G1 ratio to place missing peaks "G1" peaks given
 a corresponding "G2/M" peak, default value of \code{1.90}}
 
-\item{chan}{Character vector to specify the channel to normalize (\code{"FL2.A"})}
-
 \item{limits}{Optional numeric vector of length 2 specifying the limits
 for the transformed data. If \code{NULL}, the instrument range for data in
 \code{chan} will be used. If \code{FALSE} the range will be \code{-Inf} to \code{+Inf}.}
+
+\item{...}{Optional arguments passed to \code{\link[=peakFind]{peakFind()}} and then to
+\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} including \code{range.search}, \code{probs},
+\code{bwFac} and \code{gridsize}}
 
 \item{range.search}{A numeric vector of length 2 specifying the range
 of values in the original data in which peaks will be accepted. The
 default value of \code{c(50, 500)} is chosen to ignore apoptotic values and
 polyploid peaks in typical data}
-
-\item{...}{Additional arguments passed to \code{\link[=peakFind]{peakFind()}} and then to
-\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}}}
 }
 \value{
 A transformed and scaled \code{flowSet}.
@@ -69,14 +69,14 @@ Transformed values will be trimmed to the range specified by
 No trimming will occur if \code{limits = FALSE}.
 }
 \examples{
- fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+ fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
  bf <- boundaryFilter("FL2.A")
  lg <- linearGate(fs)
  fs <- Subset(fs, bf & lg)
- o1 <- dnaplot(~ FL2.A, fs, xlim = c(120, 380), main = "Raw", plot = FALSE)
+ o1 <- dnaplot(~FL2.A, fs, xlim = c(120, 380), main = "Raw", plot = FALSE)
  pks <- peakFind(fs, range.search = c(100, 400))
  fs.adj <- peakAdjust(fs, peaks = pks, g1 = 180)
- o2 <- dnaplot(~ FL2.A, fs.adj, xlim = c(120, 380), main = "Adjusted", plot = FALSE)
+ o2 <- dnaplot(~FL2.A, fs.adj, xlim = c(120, 380), main = "Adjusted", plot = FALSE)
  plot(o1, split = c(1, 1, 2, 1), more = TRUE)
  plot(o2, split = c(2, 1, 2, 1), more = FALSE)
 

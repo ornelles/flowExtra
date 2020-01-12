@@ -53,7 +53,7 @@
 #'    argument \code{as.percent = TRUE}
 #'
 #' @examples
-#'  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+#'  fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
 #'  fs <- fs[c(3, 7, 11, 15)]
 #'  res <- filter(fs, norm2Filter("FSC.H", "SSC.H", scale.factor = 2))
 #'  xyplot(SSC.H ~ FSC.H, fs, filter = res, stats = TRUE)
@@ -68,7 +68,7 @@
 #' For \code{getFres}: a numeric vector of the desired statistic \emph{or}
 #' a character string formatted as the percent of positive or negative events.
 #'
-#' @import flowCore
+#' @importFrom flowCore filter
 #' 
 #' @export
 #' 
@@ -86,7 +86,7 @@ getFres <- function(x, filter,
 		if (class(filter) %in% c("filterResultList", "logicalFilterResult"))
 			fres <- filter
 		else if (is(filter, "filter"))
-			fres <- filter(x, filter)
+			fres <- flowCore::filter(x, filter)
 		else
 			stop("'filter' must be a filter object")
 	}

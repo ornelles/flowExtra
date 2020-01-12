@@ -58,13 +58,14 @@
 #' A rectangular \code{polygonGate} or list of these gates.
 #'
 #' @examples
-#'  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
-#'  lg <- linearGate(fs) # default settings
-#'  xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg[1:4], stats = TRUE)
-#'  lg2 <- linearGate(fs, width = 0.02, gRange = c(75, 750))
-#'  xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg2[1:4], stats = TRUE)
+#' # Read synchronized cell data
+#'   fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
+#'   lg <- linearGate(fs) # default settings
+#'   xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg[1:4], stats = TRUE)
+#'   lg2 <- linearGate(fs, width = 0.02, gRange = c(75, 750))
+#'   xyplot(FL2.H ~ FL2.A, fs[1:4], filter = lg2[1:4], stats = TRUE)
 #'
-#' @import flowCore
+#' @importFrom flowCore polygonGate fsApply filterList
 #' @importFrom MASS lqs
 #'
 #' @export

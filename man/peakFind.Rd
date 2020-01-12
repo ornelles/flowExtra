@@ -63,8 +63,8 @@ are found, the peaks will be labeled as \code{"peak1"}, \code{"peak2"}, \code{"p
 etc. A warning message will report finding other than 2 peaks.
 }
 \examples{
- fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
- findPeaks(fs) # find all by default
- findPeaks(fs, range.search = c(50, 500)) # find probable G1 and G2
+ fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
+ peakFind(fs) # find all by default
+ peakFind(fs, range.search = c(50, 500)) # find probable G1 and G2
 
 }

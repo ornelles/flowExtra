@@ -53,7 +53,7 @@ the call now becomes:\preformatted{  densityplot(~ chan, ..., dargs = dargs)
 }
 \examples{
 # load and filter example data with 16 flowFrames
-  fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+  fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
   fs <- Subset(fs, boundaryFilter("FL2.A"))
 # default density parameters from flowViz 
   dnaplot(~ FL2.A, fs, xlim = c(50, 500), darg = NULL, main = "Original")

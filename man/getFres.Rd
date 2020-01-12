@@ -84,7 +84,7 @@ Note that with \code{what = "n"} or \code{what = "count"},
 the \code{excluded} option is ignored.
 }
 \examples{
- fs <- readSet(system.file("extdata", "RPE_synch/", package = "flowExtra"))
+ fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
  fs <- fs[c(3, 7, 11, 15)]
  res <- filter(fs, norm2Filter("FSC.H", "SSC.H", scale.factor = 2))
  xyplot(SSC.H ~ FSC.H, fs, filter = res, stats = TRUE)
