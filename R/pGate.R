@@ -149,7 +149,7 @@ pGate <- function(type = c("arbitrary", "parallel", "convex", "ellipse"),
 		bd <- bd[ord[c(1,3,4,2)],]
 
 		if (is.null(filterId))
-			filterId <- "defaultParellelGate"
+			filterId <- "defaultParallelGate"
 	}
 	else
 		stop("unexpected value for 'type' = ", type)

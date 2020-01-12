@@ -44,6 +44,10 @@
 
 # assemble list of gates and show results
 	gates <- filters(list(G1 = g1, S = s, G2 = g2))
-	flist <- rep(list(gates), 3)
-	names(flist) <- pData(fs)$name
+	flist <- setNames(rep(list(gates), 3), pData(fs)$name)	
 	xyplot(FL1.H ~ FL3.H, fs, filter = flist, nbin = 256, stats = TRUE)
+
+# extract the results with getFres and plot
+	res <- sapply(gates, function(g) getFres(fs, g))
+	res
+	barchart(res, horizontal = FALSE, auto.key = T)

@@ -1,30 +1,39 @@
-	f <- function(x, A1, mod1, A2, mod2) {
-		m1 <- mod1$estimate[1]
-		s1 <- mod1$estimate[2]
-		m2 <- mod2$estimate[1]
-		s2 <- mod2$estimate[2]
-		K <- sqrt(2 * pi) 
-		p1 <- A1/(s1*K)*exp(-0.5*((x - m1)/s1)^2)
-		p2 <- A2/(s2*K)*exp(-0.5*((x - m2)/s2)^2)
-		ans <- p1 + p2
+# path to github
+	github <- if (.Platform$OS.type == "unix") "~/Documents/github" else "~/github"
 
-f <- function(x, a, b, m1, s1, m2, s2) {
-	K <- sqrt(2 * pi)
-	p1 <- a/(s1*K)*exp(-0.5*((x-m1)/s1)^2)
-	p2 <- b/(s2*K)*exp(-0.5*((x-m2)/s2)^2)
-	ans <- p1 + p2
-}
+# working git
+	path <- file.path(github, "flowExtra")
+	setwd(path)
 
-d <- density(exprs(fs[[16]][,"FL2.A"]), adj = 0.5, n = 1024)
-peaks <- peakFind(fs[[16]])[1:2]
-start <- list(a = 0.5, b = 0.5, m1 = peaks[1], s1 = 10, m2 = peaks[2], s2 = 10)
-fm <- nls(y ~ fun(x, a, b, m1, s1, m2, s2), data.frame(x = d$x, y = d$y), 
-	start = start, algorithm = "port")
-coef(fm)
-# "s-phase" for clean profile
-1 - sum(coef(fm)[1:2])
-plot(d)
-lines(d$x, predict(fm), col = 2)
+# libraries 
+	library(flowCore)
+	library(flowStats)
+	library(flowViz)
+	flowViz.par.set(theme = trellis.par.get(), reset = TRUE)
+
+# R files
+	ff <- list.files("R/", full = TRUE)
+	ff <- setdiff(ff, c("R/my flow code.R", "R/zzz.R"))
+	for(f in ff) source(f)
+
+# load and process REP synch data
+	fs <- readSet("inst/extdata/synch/")
+	bf <- boundaryFilter(c("SSC.H","FSC.H","FL2.H","FL2.A"))
+	lg <- linearGate(fs)
+	fs <- Subset(fs, bf)
+	fs <- Subset(fs, lg)
+		
+# explore
+	d <- density(exprs(fs[[16]][,"FL2.A"]), adj = 0.5, n = 1024)
+	peaks <- peakFind(fs[[16]])[1:2]
+	start <- list(a = 0.5, b = 0.5, m1 = peaks[1], s1 = 10, m2 = peaks[2], s2 = 10)
+	fm <- nls(y ~ fun(x, a, b, m1, s1, m2, s2), data.frame(x = d$x, y = d$y), 
+		start = start, algorithm = "port")
+	coef(fm)
+	# "s-phase" for clean profile
+	1 - sum(coef(fm)[1:2])
+	plot(d)
+	lines(d$x, predict(fm), col = 2)
 # change coefficients to vectors and you got multinomal fitting
 
 # 'mixtools' library for mixture models
@@ -81,19 +90,21 @@ fun <- function(x, mean, sigma = NULL, lambda = NULL, cv = 0.05)
 #
 # May need to adjust logic in peakFind()
 #
-peaks <- peakFind(fs)[,1:2]
-par(ask = TRUE)
-for (i in 1:16) {
-	d <- density(exprs(fs[[i]][,"FL2.A"]), adj = 0.5, n = 1024)
-	myPeaks <- peaks[i,]
-	n <- sum(sel)
-	fmx <- nls(y ~ fun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
-		start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(1, n)))
-	plot(d)
-	lines(d$x, predict(fmx), col = 2)
-}
+	peaks <- peakFind(fs)[,1:2]
+	par(ask = TRUE)
+	for (i in 1:16) {
+		d <- density(exprs(fs[[i]][,"FL2.A"]), adj = 0.5, n = 1024)
+		myPeaks <- peaks[i,]
+		sel <- !is.na(myPeaks)
+		myPeaks <- myPeaks[sel]
+		n <- sum(sel)
+		fmx <- nls(y ~ fun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
+			start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(1, n)/n))
+		plot(d)
+		lines(d$x, predict(fmx), col = 2)
+	}
 
-## Works!
+## Once worked -- now fails with "improved" peakFind...
 #
 # fold into function to convert FL2.A values to density, fit, return labda
 # values and "inter-peak" fraction
