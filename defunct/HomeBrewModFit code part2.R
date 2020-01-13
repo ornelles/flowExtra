@@ -22,46 +22,27 @@
 	lg <- linearGate(fs)
 	fs <- Subset(fs, bf)
 	fs <- Subset(fs, lg)
-		
-# explore
-	d <- density(exprs(fs[[16]][,"FL2.A"]), adj = 0.5, n = 1024)
-	peaks <- peakFind(fs[[16]])[1:2]
-	start <- list(a = 0.5, b = 0.5, m1 = peaks[1], s1 = 10, m2 = peaks[2], s2 = 10)
-	fm <- nls(y ~ fun(x, a, b, m1, s1, m2, s2), data.frame(x = d$x, y = d$y), 
-		start = start, algorithm = "port")
-	coef(fm)
-	# "s-phase" for clean profile
-	1 - sum(coef(fm)[1:2])
-	plot(d)
-	lines(d$x, predict(fm), col = 2)
-# change coefficients to vectors and you got multinomal fitting
 
-# 'mixtools' library for mixture models
-# works pretty well but forces data to fit given model, need
-# to add error/debris component with more explicit modeling
+## 'mixtools' library for mixture models
+## works pretty well but forces data to fit given model, need
+## to add error/debris component with more explicit modeling
 
 ##
 ## multigaussian function applied to density distribution
 ##
-fun <- function(x, mean, sigma = NULL, lambda = NULL, cv = 0.05)
+mfun <- function(x, mean, sigma = NULL, lambda = NULL)
 {
 # argument checks
+	CV <- 0.05
 	N <- length(mean)
-	if (N < 1 | N > length(x) / 10)
-		stop("length 'mean' should be between 1 and ", round(length(x)/10))
 	if (identical(lambda, NULL))
-		lambda <- rep(1, N)/N
+		lambda <- rep(1, N)
+	lambda <- rep(lambda, N)[1:N]
 	if (sum(lambda > 1))
 		lambda <- lambda/sum(lambda)
-	if (length(lambda) != N)
-		stop("length 'lambda' should be ", N)
-	if (cv < 0 | cv > 2)
-		warning("'cv' should be between 0 and 1")
 	if (identical(sigma, NULL))
-		sigma <- abs(cv * mean)
-	if (any(sigma < 0))
-		stop("'sigma' should be greater than 0")
-	sigma <- rep(sigma, N)[1:N] # replicate along peaks
+		sigma <- abs(CV * mean)
+	sigma <- rep(sigma, N)[1:N]
 
 # single gaussian distribution
 	gfun <- fun <- function(x, m, s)
@@ -90,22 +71,46 @@ fun <- function(x, mean, sigma = NULL, lambda = NULL, cv = 0.05)
 #
 # May need to adjust logic in peakFind()
 #
-	peaks <- peakFind(fs)[,1:2]
+	peaks <- peakFind(fs) 
 	par(ask = TRUE)
 	for (i in 1:16) {
-		d <- density(exprs(fs[[i]][,"FL2.A"]), adj = 0.5, n = 1024)
-		myPeaks <- peaks[i,]
+		d <- density(exprs(fs[[i]][,"FL2.A"]), n = 1024)
+		myPeaks <- peaks[i,1:2] # use first two peaks
 		sel <- !is.na(myPeaks)
 		myPeaks <- myPeaks[sel]
-		n <- sum(sel)
-		fmx <- nls(y ~ fun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
-			start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(1, n)/n))
+		n <- sum(sel) # number of peaks (currently 2)
+
+	# non-linear fit to multiple Gaussian peaks
+		fmx <- nls(y ~ mfun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
+			start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(0.9, n)/n))
+		cf <- coef(fmx)
+		mu <- cf[grep("mean", names(cf))]
+		lambda <- cf[grep("lambda", names(cf))]
+		sigma <- cf[grep("sigma", names(cf))]
+
+	# visualize
 		plot(d)
-		lines(d$x, predict(fmx), col = 2)
+	# smooth prediction
+		yp <- predict(fmx)
+		lines(d$x, yp, col = 2)
+ # non-negative difference
+		yd <- ifelse(d$y > yp, d$y - yp, 0)
+		lines(d$x, yd, col = 4)
+	# define factor areas between peaks and sum remaining 
+		g <- cut(d$x, c(-Inf, mu, Inf))
+		dif <- tapply(yd, g, sum)/sum(yp)
+	# need to scale down difference to ensure sum is 1
+		adj <- sum(lambda) + sum(dif) - 1
+		dif <- dif *(sum(dif) - adj)/sum(dif)
+		cc <- c(dif[1], coef(fmx)[5], dif[2], coef(fmx)[6], dif[3])
+		names(cc) <- c("<G1", "G1", "S phase", "G2/M", ">G2")
+		txt <- c(names(cc), sprintf("%3.1f%%", 100*cc))
+		legend("topright", legend = txt, xjust = 1, ncol = 2)
+		print(cc)
 	}
 
-## Once worked -- now fails with "improved" peakFind...
+## Works again with "improved" peakFind
 #
-# fold into function to convert FL2.A values to density, fit, return labda
+# folded into function to convert FL2.A values to density, fit, return lambda
 # values and "inter-peak" fraction
 

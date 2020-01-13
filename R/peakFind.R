@@ -37,6 +37,7 @@
 #'   quantiles to set the value for `range.search` if not provided
 #' @param bwFac,gridsize Numeric values of length 1 and 2 used by
 #'   [flowStats::curv1Filter()] to identify regions of 1-D curvature in
+#'   the data (`bwFac` increased from default of 1.2 to 2)
 #' 
 #' @return
 #' An 2-D array with row names obtained from [flowCore::identifier()]
@@ -53,7 +54,7 @@
 #' @export
 #' 
 peakFind <- function(x, chan = "FL2.A", darg = list(bw = "nrd0", n = 512),
-		range.search = NULL, probs = c(0.05, 0.95), bwFac = 1.2,
+		range.search = NULL, probs = c(0.05, 0.95), bwFac = 2,
 		gridsize = rep(401, 2))
 {
 	# argument check

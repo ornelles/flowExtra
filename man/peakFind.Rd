@@ -10,7 +10,7 @@ peakFind(
   darg = list(bw = "nrd0", n = 512),
   range.search = NULL,
   probs = c(0.05, 0.95),
-  bwFac = 1.2,
+  bwFac = 2,
   gridsize = rep(401, 2)
 )
 }
@@ -31,7 +31,8 @@ in \code{probs}}
 quantiles to set the value for \code{range.search} if not provided}
 
 \item{bwFac, gridsize}{Numeric values of length 1 and 2 used by
-\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} to identify regions of 1-D curvature in}
+\code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} to identify regions of 1-D curvature in
+the data (\code{bwFac} increased from default of 1.2 to 2)}
 }
 \value{
 An 2-D array with row names obtained from \code{\link[flowCore:identifier]{flowCore::identifier()}}
