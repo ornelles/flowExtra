@@ -83,25 +83,55 @@ mfun <- function(x, mean, sigma = NULL, lambda = NULL)
 	# non-linear fit to multiple Gaussian peaks
 		fmx <- nls(y ~ mfun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
 			start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(0.9, n)/n))
+
+	# extract and separate coefficients
 		cf <- coef(fmx)
 		mu <- cf[grep("mean", names(cf))]
 		lambda <- cf[grep("lambda", names(cf))]
 		sigma <- cf[grep("sigma", names(cf))]
 
-	# visualize
+	# visualize with smoothed curve
 		plot(d)
-	# smooth prediction
 		yp <- predict(fmx)
 		lines(d$x, yp, col = 2)
- # non-negative difference
+
+	# extract difference, make non-negative
 		yd <- ifelse(d$y > yp, d$y - yp, 0)
-		lines(d$x, yd, col = 4)
-	# define factor areas between peaks and sum remaining 
-		g <- cut(d$x, c(-Inf, mu, Inf))
-		dif <- tapply(yd, g, sum)/sum(yp)
-	# need to scale down difference to ensure sum is 1
+
+	# create factor defining areas between peaks
+		sf <- 1 # sigma factor to extend from peak
+		lo <- c(-Inf, mu - sf * sigma)
+		hi <- c(mu + sf * sigma, Inf)
+		cuts <- cbind(lo, hi)
+
+	# split d$x and yd according to cuts
+		sel <- apply(cuts, 1, function(v) d$x > v[1] & d$x < v[2])
+		x.spl <- apply(sel, 2, function(s) d$x[s])
+		x.spl <- if (is.matrix(x.spl)) split(x.spl, col(x.spl)) else x.spl
+		y.spl <- apply(sel, 2, function(s) yd[s])
+		y.spl <- if (is.matrix(y.spl)) split(y.spl, col(y.spl)) else y.spl
+
+	# sum values outside of peaks
+		dif <- sapply(y.spl, sum)
+
+	# adjust 'dif' to make area under curve = 1
 		adj <- sum(lambda) + sum(dif) - 1
 		dif <- dif *(sum(dif) - adj)/sum(dif)
+
+	# add smooth curves for inter-peak stuff for dif > 5%
+		fml <- Map(function(x, y) loess(y ~ x, span = 1/3), x.spl, y.spl)
+
+	# add curves for 'dif' values > 5% OR S phase (as here)
+	#	sel <- which(dif > 0.05)
+		sel <- 2
+		for (i in sel) {
+			yy <- predict(fml[[i]])
+			yy <- ifelse(yy < 0, 0, yy)
+			xx <- x.spl[[i]]
+			lines(xx, yy, col = 4)
+		}
+		
+	# names...for two peaks
 		cc <- c(dif[1], coef(fmx)[5], dif[2], coef(fmx)[6], dif[3])
 		names(cc) <- c("<G1", "G1", "S phase", "G2/M", ">G2")
 		txt <- c(names(cc), sprintf("%3.1f%%", 100*cc))
