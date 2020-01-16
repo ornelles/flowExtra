@@ -28,37 +28,93 @@
 ## to add error/debris component with more explicit modeling
 
 ##
-## multigaussian function applied to density distribution
+## single gaussian distribution
 ##
-mfun <- function(x, mean, sigma = NULL, lambda = NULL)
-{
-# argument checks
-	CV <- 0.05
-	N <- length(mean)
-	if (identical(lambda, NULL))
-		lambda <- rep(1, N)
-	lambda <- rep(lambda, N)[1:N]
-	if (sum(lambda > 1))
-		lambda <- lambda/sum(lambda)
-	if (identical(sigma, NULL))
-		sigma <- abs(CV * mean)
-	sigma <- rep(sigma, N)[1:N]
-
-# single gaussian distribution
 	gfun <- fun <- function(x, m, s)
 		1/(s * sqrt(2 * pi))*exp(-0.5 * ((x - m)/s)^2)
 
-# assemble multiple gaussian function
-	xdat <- rep(list(x), N)
-	ans <- Map(function(x, mean, sigma, lambda) {
-		lambda * gfun(x, mean, sigma)}, xdat, mean, sigma, lambda)
+##
+## multigaussian function applied to density distribution
+##
+	mgfun <- function(x, mean, sigma = NULL, lambda = NULL)
+	{
+	# argument checks
+		CV <- 0.05
+		N <- length(mean)
+		if (identical(lambda, NULL))
+			lambda <- rep(1, N)
+		lambda <- rep(lambda, N)[seq_len(N)]
+		if (sum(lambda > 1))
+			lambda <- lambda/sum(lambda)
+		if (identical(sigma, NULL))
+			sigma <- abs(CV * mean)
+		sigma <- rep(sigma, N)[seq_len(N)]
 
-# sum contribution at each x-value
-	ans <- do.call(cbind, ans)
-	ans <- apply(ans, 1, sum)
-	return(ans)
-}
+	# assemble multiple gaussian function
+		xdat <- rep(list(x), N)
+		ans <- Map(function(x, mean, sigma, lambda) {
+			lambda * gfun(x, mean, sigma)}, xdat, mean, sigma, lambda)
 
+	# sum contribution at each x-value
+		ans <- do.call(cbind, ans)
+		ans <- apply(ans, 1, sum)
+		return(ans)
+	}
+##
+## left/right half peak fitting
+##
+# Possibly asymmetric Gaussian fit for left or right side of gaussian
+# Take difference and use var = (actual - fit)^2 for variance for weighting
+#
+	gfit <- function(x, side = c("none", "left", "right")) {
+		side <- match.arg(side)
+		d <- density(x)
+		xmid <- d$x[which.max(d$y)]
+		if (side == "none")
+			xx <- x
+		else if (side == "left") {
+			xl <- x[x <= xmid]
+			xx <- c(xl, 2*xmid  - xl)
+		}
+		else {
+			xr <- x[x >= xmid]
+			xx <- c(2*xmid - xr, xr)
+		}
+		ans <- MASS::fitdistr(xx, "normal")
+		cf <- ans$estimate
+		yf <- dnorm(d$x, cf[["mean"]], cf[["sd"]])
+		scale <- max(d$y)/max(yf)
+		return(list(mean = cf[["mean"]], sd = cf[["sd"]], scale = scale))
+	}
+
+# generate skewed distribution with mgfun
+	xd <- 0:100
+	yd <- mgfun(x, c(40, 50, 60, 70), c(10, 20, 20, 20), lambda = c(12, 6, 4, 2))
+
+# generate 1e4 X values for distribution and Z for reversed distribution
+	set.seed(1234)
+	n <- round(2e4*(yd + rnorm(yd, mean = 0, sd = mean(yd)/20)))
+	n <- ifelse(n < 0, 0, n)
+	X <- sample(rep(xd, n), 1e4)
+
+	n <- round(2e4*(yd + rnorm(yd, mean = 0, sd = mean(yd)/20)))
+	n <- ifelse(n < 0, 0, n)
+	Z <- sample(rep(rev(xd), n), 1e4)
+
+# Show that it works
+	plot(density(X))
+	ans <- gfit(X, "left")
+	lines(xd, dnorm(xd, ans$mean, ans$sd)*ans$scale, col = 2)
+
+	plot(density(Z))
+	ans <- gfit(Z, "right")
+	lines(xd, dnorm(xd, ans$mean, ans$sd)*ans$scale, col = 2)
+
+# Take difference between actual and symmetric/scaled result from gfit as
+# the variance to form weights as 1/variance^2
+#
+# Decide on how to form (possibly overlapping) weights to pass to nls with
+# in mgfun (below) 
 #
 # works with high quality starting parameters, use other algorithms if need be
 # tweak bwFac for best peak discrimination
@@ -80,8 +136,11 @@ mfun <- function(x, mean, sigma = NULL, lambda = NULL)
 		myPeaks <- myPeaks[sel]
 		n <- sum(sel) # number of peaks (currently 2)
 
+##
+## Figure out how to weight with asymmetric fits
+##
 	# non-linear fit to multiple Gaussian peaks
-		fmx <- nls(y ~ mfun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
+		fmx <- nls(y ~ mgfun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
 			start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(0.9, n)/n))
 
 	# extract and separate coefficients
@@ -133,7 +192,7 @@ mfun <- function(x, mean, sigma = NULL, lambda = NULL)
 		
 	# names...for two peaks
 		cc <- c(dif[1], coef(fmx)[5], dif[2], coef(fmx)[6], dif[3])
-		names(cc) <- c("<G1", "G1", "S phase", "G2/M", ">G2")
+		names(cc) <- c("<G1", "G1", "S phase", "G2", ">G2")
 		txt <- c(names(cc), sprintf("%3.1f%%", 100*cc))
 		legend("topright", legend = txt, xjust = 1, ncol = 2)
 		print(cc)
@@ -142,5 +201,24 @@ mfun <- function(x, mean, sigma = NULL, lambda = NULL)
 ## Works again with "improved" peakFind
 #
 # folded into function to convert FL2.A values to density, fit, return lambda
+#
 # values and "inter-peak" fraction
+##
+## parameters to capture for peakfit object?
+##
+# peak parameters (mean, sigma, lambda)
+# other parameters (loess model with model frame?)
+# channel
 
+
+##
+## parameters to report for peakfit object?
+##
+# File
+# G1 % at peak
+# G2 % at peak
+# G2/G1 ratio
+# S
+# %CV (of G1 peak)
+# total events
+# events per channel
