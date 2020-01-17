@@ -66,48 +66,58 @@
 # Possibly asymmetric Gaussian fit for left or right side of gaussian
 # Take difference and use var = (actual - fit)^2 for variance for weighting
 #
-	gfit <- function(x, side = c("none", "left", "right")) {
-		side <- match.arg(side)
+	gfit <- function(x, limit = 0.1) {
 		d <- density(x)
 		xmid <- d$x[which.max(d$y)]
-		if (side == "none")
-			xx <- x
-		else if (side == "left") {
+		skew <- (mean(x) - xmid)/sd(x)
+		if (skew > limit) { # right tail
+			tail <- "right"
 			xl <- x[x <= xmid]
 			xx <- c(xl, 2*xmid  - xl)
 		}
-		else {
+		else if (skew < -limit) { # left tail
+			tail <- "left"
 			xr <- x[x >= xmid]
 			xx <- c(2*xmid - xr, xr)
+		}
+		else {
+			tail <- "none"
+			xx <- x
 		}
 		ans <- MASS::fitdistr(xx, "normal")
 		cf <- ans$estimate
 		yf <- dnorm(d$x, cf[["mean"]], cf[["sd"]])
 		scale <- max(d$y)/max(yf)
-		return(list(mean = cf[["mean"]], sd = cf[["sd"]], scale = scale))
+		return(list(mean = cf[["mean"]], sd = cf[["sd"]], scale = scale,
+			skew = skew, tail = tail))
 	}
 
 # generate skewed distribution with mgfun
-	xd <- 0:100
-	yd <- mgfun(x, c(40, 50, 60, 70), c(10, 20, 20, 20), lambda = c(12, 6, 4, 2))
+	xd <- seq(1, 100, len = 1000)
+	yd <- mgfun(xd, c(40, 50, 60, 70), c(10, 20, 20, 20), lambda = c(12, 6, 4, 2))
 
 # generate 1e4 X values for distribution and Z for reversed distribution
-	set.seed(1234)
+	set.seed(321)
 	n <- round(2e4*(yd + rnorm(yd, mean = 0, sd = mean(yd)/20)))
 	n <- ifelse(n < 0, 0, n)
 	X <- sample(rep(xd, n), 1e4)
 
 	n <- round(2e4*(yd + rnorm(yd, mean = 0, sd = mean(yd)/20)))
 	n <- ifelse(n < 0, 0, n)
-	Z <- sample(rep(rev(xd), n), 1e4)
+	Y <- sample(rep(rev(xd), n), 1e4)
 
+	yn <- dnorm(xd, 40, 10)
+	n <- round(2e4*(yn + rnorm(yn, mean = 0, sd = mean(yd)/20)))
+	n <- ifelse(n < 0, 0, n)
+	Z <- sample(rep(xd, n), 1e4)
+	
 # Show that it works
 	plot(density(X))
-	ans <- gfit(X, "left")
+	ans <- gfit(X)
 	lines(xd, dnorm(xd, ans$mean, ans$sd)*ans$scale, col = 2)
 
-	plot(density(Z))
-	ans <- gfit(Z, "right")
+	plot(density(Y))
+	ans <- gfit(Y)
 	lines(xd, dnorm(xd, ans$mean, ans$sd)*ans$scale, col = 2)
 
 # Take difference between actual and symmetric/scaled result from gfit as
@@ -222,3 +232,29 @@
 # %CV (of G1 peak)
 # total events
 # events per channel
+
+# multi-peak generating cell cycle faking!
+	xp <- 1:1024
+	mu <- seq(200, 400, len = 9)
+	lam <- rep(0, length(mu))
+	lam[c(1,9)] <- c(70, 15)
+	lam[2:8] <- c(5,3,1,1,1,1,3)
+	yp <- mgfun(xp, mu, lambda = lam)
+	y <- round(2e4*yp)
+	err <- sample(c(0,0,0,1,1,1,2,2,3), length(xp), TRUE)
+	C <- rep(xp, y + err)
+	C <- sample(C, 1e4)
+	plot(density(C), ylim = c(0, 0.03))
+
+	x1 <- subset(xp, xp > 100 & xp < 300)
+	y1 <- f1$scale * gfun(xp, f1$mean, f1$sd)
+	f1 <- gfit(C[C > 100 & C < 300])
+
+	x1 <- subset(xp, xp > 300 & xp < 500)
+	f2 <- gfit(C[C > 300 & C < 500])
+	y2 <- f2$scale * gfun(xp, f2$mean, f2$sd)
+
+# Not fitting, but could be good for extracting variance
+	plot(density(C), ylim = range(y1, y2))
+	lines(xp, y1 + y2, col = 2)
+
