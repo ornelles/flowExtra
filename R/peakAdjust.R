@@ -88,7 +88,7 @@ peakAdjust <- function(fs, chan = "FL2.A", peaks, g1 = 200, ratio = 1.92,
 			peaks <- cbind(peaks, NA)
 		else
 			peaks <- cbind(rep(peaks, length(fs)), NA)
-	peaks <- peaks[, 1:2] # use first two peaks
+	peaks <- peaks[, 1:2, drop = FALSE] # use first two peaks
 
 # adjust any invisible G1 peaks that have a G2 counterpart
 	missingG1 <- is.na(peaks[,1])

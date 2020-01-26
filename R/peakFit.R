@@ -17,7 +17,7 @@
 	gfun <- function(x, mean, sd)
 		1/(sd * sqrt(2 * pi))*exp(-0.5 * ((x - meam)/sd)^2)
 
-#' @name fgfun
+#' @name mgfun
 #' @rdname peakFit
 #'
 #' Density distribution function for multiple Gaussian function of 
@@ -26,9 +26,9 @@
 #'
 #' @param x Values at which to evaluate the function
 #' @param mean Numeric vector of mean for each Gaussian component
-#' @param sd Numeric vector standard deviations (sigma) for each Gaussian
+#' @param sd Numeric vector of standard deviation (sigma) for each Gaussian
 #'   component with a default value of `0.05 * mean`
-#' @param lambda Numeric vector between serving as the multiplier for
+#' @param lambda Numeric vector serving as the multiplier for
 #'   the relative area of each Gaussian component with a default value of 
 #'   `1/length(mean)` for each. The value will be adjusted to
 #'   `lambda/sum(lambda)` to permit a value such as `c(2, 5)` to express the
@@ -36,8 +36,6 @@
 #'
 #' @return The combined Gaussian density for given `x` values and parameters
 #'
-### Works for integer values in x, but not otherwise
-### NEED TO USE TRUE DENSITY with diff(x) 
 	mgfun <- function(x, mean, sd = 0.05 * mean, lambda = 1/length(mean))
 	{
 	# argument checks

@@ -1,5 +1,5 @@
 # path to github
-	github <- if (.Platform$OS.type == "unix") "~/Documents/github" else "~/github"
+	github <- if(.Platform$OS.type=="unix") "~/Documents/github" else "~/github"
 
 # working git
 	path <- file.path(github, "flowExtra")
@@ -34,32 +34,27 @@
 		1/(s * sqrt(2 * pi))*exp(-0.5 * ((x - m)/s)^2)
 
 ##
-## multigaussian function applied to density distribution
+## multiple gaussian density distribution
 ##
-	mgfun <- function(x, mean, sigma = NULL, lambda = NULL)
+	mgfun <- function(x, mean, sd = 0.05 * mean, lambda = 1/length(mean))
 	{
 	# argument checks
-		CV <- 0.05
 		N <- length(mean)
-		if (identical(lambda, NULL))
-			lambda <- rep(1, N)
-		lambda <- rep(lambda, N)[seq_len(N)]
+		sd <- rep(sd, N)[seq_len(N)] # ensure number matches mean
+		lambda <- rep(lambda, N)[seq_len(N)] # ensure number matches mean
 		if (sum(lambda > 1))
 			lambda <- lambda/sum(lambda)
-		if (identical(sigma, NULL))
-			sigma <- abs(CV * mean)
-		sigma <- rep(sigma, N)[seq_len(N)]
 
-	# assemble multiple gaussian function
-		xdat <- rep(list(x), N)
-		ans <- Map(function(x, mean, sigma, lambda) {
-			lambda * gfun(x, mean, sigma)}, xdat, mean, sigma, lambda)
+	# apply single Gaussian for each value of mean/sd/lambda
+		ans <- Map(function(x, m, s, k) {
+			k * gfun(x, m, s)}, rep(list(x), N), mean, sd, lambda)
 
-	# sum contribution at each x-value
+	# sum contribution from each Gaussian
 		ans <- do.call(cbind, ans)
 		ans <- apply(ans, 1, sum)
 		return(ans)
 	}
+
 ##
 ## left/right half peak fitting
 ##
@@ -145,19 +140,18 @@
 		sel <- !is.na(myPeaks)
 		myPeaks <- myPeaks[sel]
 		n <- sum(sel) # number of peaks (currently 2)
-
-##
-## Figure out how to weight with asymmetric fits
-##
+	##
+	## TO-DO: figure out how to weight with asymmetric fits
+	##
 	# non-linear fit to multiple Gaussian peaks
 		fmx <- nls(y ~ mgfun(x, mean, sigma, lambda), data = data.frame(x = d$x, y = d$y),
 			start = list(mean = myPeaks, sigma = rep(5, n), lambda = rep(0.9, n)/n))
 
 	# extract and separate coefficients
-		cf <- coef(fmx)
-		mu <- cf[grep("mean", names(cf))]
-		lambda <- cf[grep("lambda", names(cf))]
-		sigma <- cf[grep("sigma", names(cf))]
+		cf <- matrix(coef(fmx), nrow = n)
+		mu <- cf[, 1]
+		sigma <- cf[, 2]
+		lambda <- cf[, 3]
 
 	# visualize with smoothed curve
 		plot(d)
@@ -191,8 +185,8 @@
 		fml <- Map(function(x, y) loess(y ~ x, span = 1/3), x.spl, y.spl)
 
 	# add curves for 'dif' values > 5% OR S phase (as here)
-	#	sel <- which(dif > 0.05)
-		sel <- 2
+		sel <- which(dif > 0.025)
+	#	sel <- 2
 		for (i in sel) {
 			yy <- predict(fml[[i]])
 			yy <- ifelse(yy < 0, 0, yy)
@@ -233,24 +227,56 @@
 # total events
 # events per channel
 
-# multi-peak generating cell cycle faking!
-	xp <- 1:1024
+# Create 10,000 fake data points in C
+	xchan <- 10:1000
 	mu <- seq(200, 400, len = 9)
 	lam <- rep(0, length(mu))
-	lam[c(1,9)] <- c(70, 15)
-	lam[2:8] <- c(5,3,1,1,1,1,3)
-	yp <- mgfun(xp, mu, lambda = lam)
+	lam[c(1,9)] <- c(60, 15)
+	lam[2:8] <- c(7,5,4,2,2,2,3)
+	yp <- mgfun(xchan, mu, lambda = lam)
 	y <- round(2e4*yp)
-	err <- sample(c(0,0,0,1,1,1,2,2,3), length(xp), TRUE)
-	C <- rep(xp, y + err)
+	err <- sample(c(0,0,1,1,1,1,2,2,2,3,3), length(xchan), TRUE)
+	C <- rep(xchan, y + err)
 	C <- sample(C, 1e4)
-	plot(density(C), ylim = c(0, 0.03))
 
+# Find peaks in C, assign best guess of sd (sigma) at 4% CV
+	peaks <- as.numeric(peakFind(C))
+	sigma <- 0.04 * peaks
+
+# Create kernel density estimate with 1024 channels
+	d <- density(C, n = 1024)
+
+# Split data +/- 3 sd on either side of peaks
+	sf <- 3
+	lo <- peaks - sf * sigma
+	hi <- peaks + sf * sigma
+	cuts <- cbind(lo, hi)
+	CC <- apply(cuts, 1, function(v) C[C > v[1] & C < v[2]])
+	CC <- if(is.matrix(CC)) split(cc, col(CC)) else CC
+
+# Find symmetrical Gaussian parameters for each peak
+	G <- lapply(CC, gfit)
+	Y <- lapply(G, function(g) dnorm(xp, g$mean, g$sd)*g$scale)
+
+# Fit kernel density estimate for each peak across entire range
+	D <- lapply(CC, density, from = 1, to = 1024, n = 1024)
+	YP <- lapply(D, "[[", "y") # predicted density values...
+
+##
+## stopping here again...
+##
+
+# Fit a local symmetric Gaussian to each peak across the entire range
+#  symmetrical Gaussian density to each peaks
+	xx <- apply(sel, 2, function(s) d$x)
+	xx <- if (is.matrix(xx)) split(xx, col(xx)) else xx
+
+# Fit symmetrical Gaussian density to each peaks
 	x1 <- subset(xp, xp > 100 & xp < 300)
-	y1 <- f1$scale * gfun(xp, f1$mean, f1$sd)
 	f1 <- gfit(C[C > 100 & C < 300])
+	y1 <- f1$scale * gfun(xp, f1$mean, f1$sd)
 
-	x1 <- subset(xp, xp > 300 & xp < 500)
+	x2 <- subset(xp, xp > 300 & xp < 500)
 	f2 <- gfit(C[C > 300 & C < 500])
 	y2 <- f2$scale * gfun(xp, f2$mean, f2$sd)
 

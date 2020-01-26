@@ -1,11 +1,12 @@
 #' Find G1 and G2/M peaks
 #' 
-#' Find G1 and G2/M (and other) peaks in FL2.A values
+#' Find G1 and G2/M (and other) peaks in linear values
 #' 
 #' @md
 #' @details
 #' This function identifies the probable location of the G1 and G2/M peaks
-#' in the channel identified by `chan` in either a `flowFrame` or `flowSet`.
+#' in the channel identified by `chan` in either a `flowFrame` or `flowSet`
+#' or "raw" values as described below.
 #' Areas of local high density are first identified by
 #' [flowStats::curv1Filter()] with arguments in `bwFac` and `gridsize`.
 #' The values are the default values for by `curv1Filter()`. 
@@ -20,12 +21,20 @@
 #' to `c(50, 500)` to exclude apoptotic and polyploid populations.
 #'
 #' If exactly two peaks are found, they will be labeled `"G1"` and `"G2"`.
-#' If one peak is found, it will be treated as the "`G1`" peak and
-#' the `"G2"` peak will be assigned an `NA` value. If more than two peaks
+#' If a mixture of one and two peaks are found, the single peak will be
+#' treated as the `"G1"` peak and the `"G2"` peak will be assigned an `NA`
+#' value. If only one peak is found or if more than two peaks
 #' are found, the peaks will be labeled as `"peak1"`, `"peak2"`, `"peak3"`,
 #' etc. A warning message will report finding other than 2 peaks.
 #'
+#' The argument `x` can also be a `matrix` or `numeric` vector of
+#' "raw" values which will be
+#' coerced into a matrix. If the name of a column (or vector) is `chan`,
+#' that parameter will be analyzed. If the `matrix` or `vector` is not
+#' named, the first column will be analyzed.  
+#'
 #' @param x A `flowFrame` or `flowSet` with the parameter named in `chan`
+#'   *or* a `numeric` vector or matrix (see Details)
 #' @param chan The name of the data to be evaluated in `x`
 #' @param darg List of arguments passed to the kernel density estimating
 #'   function ([stats::density()]) used to find peaks
@@ -58,10 +67,25 @@ peakFind <- function(x, chan = "FL2.A", darg = list(bw = "nrd0", n = 512),
 		gridsize = rep(401, 2))
 {
 	# argument check
-		if (!any(is(x, "flowSet"), is(x, "flowFrame")))
-			stop("'", deparse(substitute(x)), "' must be a flowFrame or a flowSet")
-		if (!chan %in% colnames(x))
-			stop('"', chan, '" is not in ', deparse(substitute(x)))
+		if (is(x, "flowSet") | is(x, "flowFrame")) {
+			if (!chan %in% colnames(x))
+				stop('"', chan, '" is not in ', deparse(substitute(x)))
+		}
+		else if (is(x, "numeric")) { # assembly dummy flowFrame
+			x <- as.matrix(x)
+			sel <- which(colnames(x) == chan)[1]
+			if (!is.na(sel))
+				x <- x[, sel]
+			else {
+				x <- x[, 1, drop = FALSE]
+				colnames(x) <- chan <- "raw"
+			}
+			x <- flowFrame(x)
+			identifier(x) <- "raw"
+		}
+		else
+			stop("'", deparse(substitute(x)), "' must be a flowFrame, a flowSet,
+				a numeric vector, or a matrix")
 
 # working function to perform peak finding on a flowFrame
 	.peakFind <- function(x, chan, range.search, darg)
@@ -90,7 +114,7 @@ peakFind <- function(x, chan = "FL2.A", darg = list(bw = "nrd0", n = 512),
 		}
 		else if (length(peaks) > 2) # report
 			warning(identifier(x), ": ", length(peaks), " peaks found", call. = FALSE)
-		return(peaks)	# return x-position of peaks
+		return(round(peaks, 1))	# return x-position of peaks
 	}
 
 # dispatch working function according to arguments
@@ -105,11 +129,13 @@ peakFind <- function(x, chan = "FL2.A", darg = list(bw = "nrd0", n = 512),
 	}
 	else
 		stop("SHOULDN'T BE HERE with argument of class ", class(x))
-	if (ncol(ans) == 2)
+
+# clean up return value
+	if (ncol(ans) == 2 && all(is.na(ans[, 2])))
+			ans <- ans[, 1, drop = FALSE]
+	if (ncol(ans) == 2 && all(ans[, 2]/ans[, 1] >= 1.9, na.rm = TRUE))
 		colnames(ans) <- c("G1", "G2")
-	else if (ncol(ans) > 2)
-		colnames(ans) <- paste0("peak", seq_len(ncol(ans)))
 	else
-		warning("SHOULD'NT BE HERE with 1-D array")
+		colnames(ans) <- paste0("peak", seq_len(ncol(ans)))
 	return(ans) # array of 2 or more dimensions
 }
