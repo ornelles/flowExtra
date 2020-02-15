@@ -15,7 +15,8 @@ peakFind(
 )
 }
 \arguments{
-\item{x}{A \code{flowFrame} or \code{flowSet} with the parameter named in \code{chan}}
+\item{x}{A \code{flowFrame} or \code{flowSet} with the parameter named in \code{chan}
+\emph{or} a \code{numeric} vector or matrix (see Details)}
 
 \item{chan}{The name of the data to be evaluated in \code{x}}
 
@@ -39,11 +40,12 @@ An 2-D array with row names obtained from \code{\link[flowCore:identifier]{flowC
 and column names determined as described above.
 }
 \description{
-Find G1 and G2/M (and other) peaks in FL2.A values
+Find G1 and G2/M (and other) peaks in linear values
 }
 \details{
 This function identifies the probable location of the G1 and G2/M peaks
-in the channel identified by \code{chan} in either a \code{flowFrame} or \code{flowSet}.
+in the channel identified by \code{chan} in either a \code{flowFrame} or \code{flowSet}
+or "raw" values as described below.
 Areas of local high density are first identified by
 \code{\link[flowStats:curv1Filter]{flowStats::curv1Filter()}} with arguments in \code{bwFac} and \code{gridsize}.
 The values are the default values for by \code{curv1Filter()}.
@@ -58,10 +60,17 @@ in \code{probs}. For well-behaved data, \code{range.search} can be set
 to \code{c(50, 500)} to exclude apoptotic and polyploid populations.
 
 If exactly two peaks are found, they will be labeled \code{"G1"} and \code{"G2"}.
-If one peak is found, it will be treated as the "\code{G1}" peak and
-the \code{"G2"} peak will be assigned an \code{NA} value. If more than two peaks
+If a mixture of one and two peaks are found, the single peak will be
+treated as the \code{"G1"} peak and the \code{"G2"} peak will be assigned an \code{NA}
+value. If only one peak is found or if more than two peaks
 are found, the peaks will be labeled as \code{"peak1"}, \code{"peak2"}, \code{"peak3"},
 etc. A warning message will report finding other than 2 peaks.
+
+The argument \code{x} can also be a \code{matrix} or \code{numeric} vector of
+"raw" values which will be
+coerced into a matrix. If the name of a column (or vector) is \code{chan},
+that parameter will be analyzed. If the \code{matrix} or \code{vector} is not
+named, the first column will be analyzed.
 }
 \examples{
  fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))

@@ -105,51 +105,6 @@ rangeCut <- function(x, stain, cut = 0.99, plot = FALSE, positive = TRUE,
 	names(bounds) <- stain
 	rectangleGate(bounds, filterId = filterId)
 }
-#
-# Add text to an existing lattice plot where x can be an x, y point structure
-#
-addText <- function(x, y, labels, col = "red", cex = 2/3, adj = 0.5) {
-
-	mat <- trellis.currentLayout("panel")
-	N <- sum(mat != 0)
-	if (N == 0)
-		stop ("no lattice object found")
-
-	if (missing(y)) {			# x should be a list
-		if (all(c("x", "y") %in% names(x))) {
-			xx <- x$x
-			yy <- x$y
-		}
-	}
-	else if (is.character(y)) {	# y is assumed to have labels
-		labels <- y
-		if (all(c("x", "y") %in% names(x))) {
-			xx <- x$x
-			yy <- x$y
-		}
-	}
-	else {		# x and y better be numeric...
-		xx <- as.numeric(x)
-		yy <- as.numeric(y)
-	}
-	if (missing(labels))
-		labels <- seq_along(xx)
-
-	if (length(xx) == 1) {
-		xx <- rep(xx, N)
-		yy <- rep(yy, N)
-	}
-	if (length(xx) != N)
-		stop("number of panels (", N, ") and number of points (", length(xx), ") differ")
-
-	for (i in 1:N) {
-		column <- which(apply(mat, 2, function(x) any(x == i)))
-		row <- which(apply(mat, 1, function(x) any(x == i)))
-		trellis.focus("panel", column = column, row = row, highlight = FALSE)
-		do.call(panel.text, list(xx[i], yy[i], labels[i], cex = cex, col = col, adj = adj))
-		trellis.unfocus()
-	}
-}
 
 #
 # Use base graphics to generate colorized density plot as for cell cycle

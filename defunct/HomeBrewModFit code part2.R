@@ -246,8 +246,8 @@
 # Create kernel density estimate with 1024 channels
 	d <- density(C, n = 1024)
 
-# Split data +/- 3 sd on either side of peaks
-	sf <- 3
+# Split data +/- sf * sd on either side of peaks
+	sf <- 4
 	lo <- peaks - sf * sigma
 	hi <- peaks + sf * sigma
 	cuts <- cbind(lo, hi)
@@ -256,6 +256,7 @@
 
 # Find symmetrical Gaussian parameters for each peak
 	G <- lapply(CC, gfit)
+	xp <- 1:1024
 	Y <- lapply(G, function(g) dnorm(xp, g$mean, g$sd)*g$scale)
 
 # Fit kernel density estimate for each peak across entire range
@@ -263,7 +264,7 @@
 	YP <- lapply(D, "[[", "y") # predicted density values...
 
 ##
-## stopping here again...
+## stopping here again...how to assign weights
 ##
 
 # Fit a local symmetric Gaussian to each peak across the entire range

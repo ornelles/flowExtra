@@ -17,6 +17,8 @@
 	gfun <- function(x, mean, sd)
 		1/(sd * sqrt(2 * pi))*exp(-0.5 * ((x - meam)/sd)^2)
 
+#' Replacement Gaussian dnorm function
+#'
 #' @name mgfun
 #' @rdname peakFit
 #'
