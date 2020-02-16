@@ -114,7 +114,7 @@ peakFind <- function(x, chan = "FL2.A", darg = list(bw = "nrd0", n = 512),
 		}
 		else if (length(peaks) > 2) # report
 			warning(identifier(x), ": ", length(peaks), " peaks found", call. = FALSE)
-		return(round(peaks, 1))	# return x-position of peaks
+		return(signif(peaks, 5))	# return x-position of peaks
 	}
 
 # dispatch working function according to arguments
