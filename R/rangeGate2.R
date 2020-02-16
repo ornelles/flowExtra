@@ -67,8 +67,10 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 		fs <- as(fs, "flowSet")
 	flowCore:::checkClass(stain, "character", 1)
 	if (!stain %in% colnames(fs))
-		stop("'", stain, "' is not a valid parameter in this flowFrame")
-	lims <- unlist(range(fs[[1]], type = "instrument")[stain])
+		stop("'", stain, "' is not a valid parameter in this flowSet")
+	lims <- fsApply(ws[, stain], range, type = "data")
+	lims <- as.matrix(do.call(cbind, lims))
+	lims <- apply(lims, 1, range)[c(1, 4)] # min of min and max of max
 	from <- if(is.null(from)) lims[1] else max(from[1], lims[1])
 	to <- if(is.null(to)) lims[2] else min(to[1], lims[2])
 	flowCore:::checkClass(cutoff, "numeric", 1)
@@ -96,11 +98,11 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 	zc$sign <- zc$sign[keep]
 
 # extract peaks and discard those below adjusted cutoff
-	cutoff <- cutoff * diff(range(d$y)) + min(d$y)
+	adjcut <- cutoff * diff(range(d$y)) + min(d$y)
 	sel <- which(d$x %in% zc$x[zc$sign == 1])
 	xp <- d$x[sel]
 	yp <- zc$model$y[zc$model$x %in% xp]
-	sel <- yp > cutoff
+	sel <- yp > adjcut
 	xp <- xp[sel]
 	yp <- yp[sel]
 	
@@ -108,9 +110,12 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 	if (length(xp) == 0)
 		stop("unable to identify any peaks above cutoff")
 
-# if 2 peaks, use saddle
-	if (method == "minimum" && length(xp) == 2)
-		loc <- zc$x[zc$x > xp[1] & zc$x < xp[2] & zc$sign == -1]
+# if 2 peaks, use lowest minimum between peaks
+	if (method == "minimum" && length(xp) == 2) {
+		sel <- zc$x > xp[1] & zc$x < xp[2] & zc$sign == -1 # selects minimums
+		yp.loc <- zc$y[sel] # all minimum values between xp[1] and xp[2]
+		loc <- zc$x[sel][which.min(yp.loc)] # x-value from lowest peak
+	}
 
 # select left-most peak from kernel density estimate
 	else {
@@ -124,15 +129,21 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 		fit <- MASS::fitdistr(xx, "normal")
 		loc <- fit$est[1] + sd * fit$est[2]
 	}
+
+# warn about too many peaks
+	if (length(xp) > 3)
+		warning(length(xp), " peaks were found with adjust = ", adjust, ".\n",
+			"Consider increasing the value of 'adjust'.")
+
 # show plot?
 	if (plot == TRUE) {
 		opar <- par(lend = 3)
 		main.txt <- paste("Breakpoint for ", stain)
-		leg.txt <- c(sprintf("break (%0.4g)", loc), "gated", "data range")
+		leg.txt <- c(sprintf("breakpoint (%0.4g)", loc), "gated data", "included data")
 		if (method == "left" | length(xp) != 2)
-			leg.title <- paste("Gaussian fit with sd =", round(sd, 1))
+			leg.title <- paste('"Left" method, sd =', round(sd, 1))
 		else
-			leg.title <- 'Choose by "minimum"'
+			leg.title <- '"Minimum" method'
 		d <- density(dat, adjust = adjust)
 		plot(d, main = main.txt, xlim = lims)
 		xv <- if (positive) d$x[d$x > loc] else d$x[d$x < loc]
@@ -149,10 +160,10 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 	}
 
 # return rectangleGate with channel limits
-	bounds <- if (positive)
-		list(c(loc, lims[2]))
+	if (positive)
+		bounds <- list(c(loc, lims[2]))
 	else
-		list(c(lims[1], loc))
+		bounds <- list(c(lims[1], loc))
 	names(bounds) <- stain
 	rectangleGate(bounds, filterId = filterId)
 }
