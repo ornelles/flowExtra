@@ -68,7 +68,7 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 	flowCore:::checkClass(stain, "character", 1)
 	if (!stain %in% colnames(fs))
 		stop("'", stain, "' is not a valid parameter in this flowSet")
-	lims <- fsApply(ws[, stain], range, type = "data")
+	lims <- fsApply(fs[, stain], range, type = "data")
 	lims <- as.matrix(do.call(cbind, lims))
 	lims <- apply(lims, 1, range)[c(1, 4)] # min of min and max of max
 	from <- if(is.null(from)) lims[1] else max(from[1], lims[1])
@@ -110,9 +110,9 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 	if (length(xp) == 0)
 		stop("unable to identify any peaks above cutoff")
 
-# if 2 peaks, use lowest minimum between peaks
-	if (method == "minimum" && length(xp) == 2) {
-		sel <- zc$x > xp[1] & zc$x < xp[2] & zc$sign == -1 # selects minimums
+# if 2 to 5 peaks, use lowest minimum between peaks
+	if (method == "minimum" && length(xp) >= 2 && length(xp) <= 5) {
+		sel <- zc$x > min(xp) & zc$x < max(xp) & zc$sign == -1 # select min
 		yp.loc <- zc$y[sel] # all minimum values between xp[1] and xp[2]
 		loc <- zc$x[sel][which.min(yp.loc)] # x-value from lowest peak
 	}
@@ -138,24 +138,29 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 # show plot?
 	if (plot == TRUE) {
 		opar <- par(lend = 3)
+		xlims <- range(fs[[1]], type = "instrument")[, stain]
 		main.txt <- paste("Breakpoint for ", stain)
-		leg.txt <- c(sprintf("breakpoint (%0.4g)", loc), "gated data", "included data")
-		if (method == "left" | length(xp) != 2)
+		leg.txt <- c(sprintf("breakpoint (%0.4g)", loc),
+			"gated data", "included data", "peaks")
+		if (method == "left" | length(xp) > 5)
 			leg.title <- paste('"Left" method, sd =', round(sd, 1))
 		else
 			leg.title <- '"Minimum" method'
 		d <- density(dat, adjust = adjust)
-		plot(d, main = main.txt, xlim = lims)
+		plot(d, main = main.txt, xlim = xlims, type = "n")
 		xv <- if (positive) d$x[d$x > loc] else d$x[d$x < loc]
 		yv <- if (positive) d$y[d$x > loc] else d$y[d$x < loc]
-		polygon(c(min(xv), xv, max(xv)), c(0, yv, 0), col = "gray90")
+		polygon(c(min(xv), xv, max(xv)), c(0, yv, 0),
+			col = "gray90", border = NA)
+		lines(d)
+		rug(xp, col = 4)
 		abline(v = loc, col = 2, lwd = 2)
 		ymid <- max(d$y)/3
 		arrows(min(x), ymid, max(x), ymid, length = 0.2, angle = 90,
 			lty = 3, code = 3)
 		legend("topright", legend = leg.txt, title = leg.title, inset = 0.05,
-			bg = "white", box.col = "white", col = c("red", "gray90", "black"),
-			lty = c(1, 1, 3), lwd = c(2, 10, 1))
+			bg = "white", box.col = "white", col = c("red", "gray90", "black", "blue"),
+			lty = c(1, 1, 3, 1), lwd = c(2, 10, 1, 1))
 		par(opar)
 	}
 
