@@ -132,35 +132,37 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 
 # warn about too many peaks
 	if (length(xp) > 3)
-		warning(length(xp), " peaks were found with adjust = ", adjust, ".\n",
-			"Consider increasing the value of 'adjust'.")
+		warning(length(xp), " peaks were found with adjust = ", adjust,
+			". Consider increasing this value.")
 
-# show plot?
+# show plot
 	if (plot == TRUE) {
 		opar <- par(lend = 3)
-		xlims <- range(fs[[1]], type = "instrument")[, stain]
+		xlim <- range(fs[[1]], type = "instrument")[, stain]
 		main.txt <- paste("Breakpoint for ", stain)
 		leg.txt <- c(sprintf("breakpoint (%0.4g)", loc),
-			"gated data", "included data", "peaks")
-		if (method == "left" | length(xp) > 5)
+			ifelse(length(xp) >1, "peaks", "peak"), "gated region",
+			"analyzed region")
+		if (method == "left" | length(xp) > 5 | length(xp) == 1)
 			leg.title <- paste('"Left" method, sd =', round(sd, 1))
 		else
 			leg.title <- '"Minimum" method'
 		d <- density(dat, adjust = adjust)
-		plot(d, main = main.txt, xlim = xlims, type = "n")
 		xv <- if (positive) d$x[d$x > loc] else d$x[d$x < loc]
 		yv <- if (positive) d$y[d$x > loc] else d$y[d$x < loc]
+		plot(d, main = main.txt, xlim = xlim, type = "n")
 		polygon(c(min(xv), xv, max(xv)), c(0, yv, 0),
 			col = "gray90", border = NA)
 		lines(d)
 		rug(xp, col = 4)
 		abline(v = loc, col = 2, lwd = 2)
-		ymid <- max(d$y)/3
+		ymid <- max(d$y)/4
 		arrows(min(x), ymid, max(x), ymid, length = 0.2, angle = 90,
 			lty = 3, code = 3)
-		legend("topright", legend = leg.txt, title = leg.title, inset = 0.05,
-			bg = "white", box.col = "white", col = c("red", "gray90", "black", "blue"),
-			lty = c(1, 1, 3, 1), lwd = c(2, 10, 1, 1))
+		legend("topright", legend = leg.txt, title = leg.title,
+			inset = 0.05, bg = "white", box.col = "white",
+			col = c("red", "blue", "gray90", "black"),
+			lty = c(1, 1, 1, 3), lwd = c(2, 1, 10, 1))
 		par(opar)
 	}
 
