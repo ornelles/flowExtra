@@ -16,6 +16,7 @@ rangeGate2(
   positive = TRUE,
   method = c("minimum", "left"),
   plot = FALSE,
+  legend = TRUE,
   filterId = "defaultRectangleGate",
   ...
 )
@@ -42,19 +43,21 @@ negative population, default value of 2.5}
 
 \item{positive}{If \code{TRUE}, gate the positive population}
 
-\item{method}{One of \code{"min"} or \code{"left"} to choose the break as the
+\item{method}{Either \code{"minimum"} or \code{"left"} to choose the break as the
 minimum between two peaks or to treat the left-most population
-as a Gaussian population of negative values}
+as a Gaussian population of the negative population}
 
 \item{plot}{If \code{TRUE}, show a plot of the data and breakpoint}
+
+\item{legend}{If \code{TRUE}, include a legend in the plot (if \code{plot == TRUE})}
 
 \item{filterId}{The name assigned to the filter (\code{character} value)}
 
 \item{...}{Other arguments to the original function are accepted
-such as \code{borderQuant}, \code{absolute}, and \code{refLine} but are ignored}
+such as \code{borderQuant}, \code{absolute}, and \code{refLine} but are discarded}
 }
 \value{
-An object of class \link['flowCore:rectangleGate']{'flowCore::rectangleGate'}
+An object of class \code{\link[flowCore:rectangleGate]{flowCore::rectangleGate}}
 }
 \description{
 This function replaces \code{\link[flowStats:rangeGate]{flowStats::rangeGate()}} which never seemed to
@@ -63,18 +66,36 @@ but will return a mores sensible \code{rectangleGate} object more
 often than \code{\link[flowStats:rangeGate]{flowStats::rangeGate()}}.
 }
 \details{
-If \code{method = "minimum"}, the breakpoint is sought first as the minimum
-between two high density regions between \code{from} and \code{to}. If more than
-two high density regions exist or if only a single high
-density region be detected, the breakpoint will be
-determined from the properties of the leftmost population
-where this population is assumed to follows a normal distribution.
-This approach can be specified directly by \code{method = "left"}.
-The maximum of this population is determined from a kernel density
-estimate. If \code{half.range = TRUE}, the \strong{left} half of the population
-will be fit to the presumed Gaussian distribution. With a single
-peak, the value returned is the position of
-the peak + \code{sd} times the standard deviation of the distribution.
+This is a replacement function for \link[flowStats:rangeGate]{flowStats::rangeGate} that may be
+more robust than the original function.
+
+This function seeks the most likely breakpoint between two
+populations to differentiate between the positive and negative
+population. The
+"negative" population is assumed to have a lower values and would be
+located on the left of a histogram.
+
+The default method (\code{method = "minimum"}) attempts to identify the
+lowest minimum between the regions of greatest density or peaks on
+a densityplot. The search can be limited to values between \code{from} and
+\code{to}. If more than four high density regions exist \emph{or} if only a
+single high density region is detected, the breakpoint will be
+determined from the properties of the leftmost population where this
+population is assumed to follows a normal distribution. This approach
+also can be specified directly by \code{method = "left"}. The maximum of
+this population is determined from a kernel density estimate. If
+\code{half.range = TRUE}, the \emph{left} half of the population will be fit to
+the presumed Gaussian distribution to estimate the standard deviation
+of the population. With \code{method = "left"}, the value returned is the
+position of the peak + \code{sd} times the standard deviation of the
+distribution.
+
+A diagnostic plot will be generated with base graphics if \code{plot = TRUE}.
+If a plot is produced, the arguments \code{legend = TRUE} (default) will add
+an informative legend to the plot showing the data and breakpoint. The
+plotting option can be useful to iteratively adjust the search parameters
+such as \code{adjust}, which is handed to the kernel density function,
+of \code{sd}, \code{from} and \code{to}.
 }
 \examples{
 
