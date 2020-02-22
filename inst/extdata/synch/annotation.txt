@@ -1,0 +1,21 @@
+#name: name
+#date: date
+#sample: sample
+#FCS_File: NA
+name	date	sample	FCS_File
+Data.001	Data.001	24-Jan-11	Asynch	Data.001
+Data.002	Data.002	24-Jan-11	3 hpr	Data.002
+Data.003	Data.003	24-Jan-11	4 hpr	Data.003
+Data.004	Data.004	24-Jan-11	5 hpr	Data.004
+Data.005	Data.005	24-Jan-11	6 hpr	Data.005
+Data.006	Data.006	24-Jan-11	7 hpr	Data.006
+Data.007	Data.007	24-Jan-11	8 hpr	Data.007
+Data.008	Data.008	24-Jan-11	9 hpr	Data.008
+Data.009	Data.009	24-Jan-11	10 hpr	Data.009
+Data.010	Data.010	24-Jan-11	11 hpr	Data.010
+Data.011	Data.011	24-Jan-11	12 hpr	Data.011
+Data.012	Data.012	24-Jan-11	13 hpr	Data.012
+Data.013	Data.013	24-Jan-11	14 hpr	Data.013
+Data.014	Data.014	24-Jan-11	15 hpr	Data.014
+Data.015	Data.015	24-Jan-11	16 hpr	Data.015
+Data.016	Data.016	24-Jan-11	asynch	Data.016
