@@ -56,10 +56,12 @@ the call now becomes:\preformatted{  densityplot(~ chan, ..., dargs = dargs)
   fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
   fs <- Subset(fs, boundaryFilter("FL2.A"))
 # default density parameters from flowViz 
-  dnaplot(~ FL2.A, fs, xlim = c(50, 500), darg = NULL, main = "Original")
+  dnaplot(~ FL2.A, fs, xlim = c(50, 500), darg = NULL,
+    main = "Default parameters for densityplot")
 # revised density parameters 
-  dnaplot(~ FL2.A, fs, xlim = c(50, 500), main = "Revised")
-# lazy use...
+  dnaplot(~ FL2.A, fs, xlim = c(50, 500),
+    main = "Adjusted parameters for 'dnaplot'")
+# lazy use if "FL2.A" is present
   dnaplot(fs)
 
 }

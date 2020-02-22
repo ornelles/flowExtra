@@ -14,7 +14,7 @@ zero.cross(x, y, first = FALSE, spar = NULL)
 \item{spar}{smoothing parameter for \code{smooth.spline} between 0 and 1}
 }
 \value{
-An \code{invisible} list identifying each extreme value found in the smoothed
+A list identifying each extreme value found in the smoothed
 curve. The components of the list include \code{x} and \code{y} for the
 x- and y-values, \code{sign} which is +1 for a maximum and -1 for a minimum,
 and the smoothing model returned by \code{smooth.spline()} in \code{model}.

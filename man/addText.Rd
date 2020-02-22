@@ -2,6 +2,7 @@
 % Please edit documentation in R/addText.R
 \name{addText}
 \alias{addText}
+\alias{text2}
 \title{Add text to an existing lattice plot}
 \usage{
 addText(x, y, labels, col = "red", cex = 2/3, adj = 0.5, ...)
@@ -24,7 +25,7 @@ adding labels.
 }
 \description{
 This serves the same role as the base function \code{\link[graphics:text]{graphics::text()}} for
-use in \code{lattice} plots.
+use in \code{lattice} plots.  (Also can be called as \code{text2()}.)
 }
 \details{
 Text labels can be added to an existing simple lattice plot with this

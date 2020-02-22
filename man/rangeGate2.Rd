@@ -81,23 +81,38 @@ a densityplot. The search can be limited to values between \code{from} and
 \code{to}. If more than four high density regions exist \emph{or} if only a
 single high density region is detected, the breakpoint will be
 determined from the properties of the leftmost population where this
-population is assumed to follows a normal distribution. This approach
-also can be specified directly by \code{method = "left"}. The maximum of
-this population is determined from a kernel density estimate. If
-\code{half.range = TRUE}, the \emph{left} half of the population will be fit to
-the presumed Gaussian distribution to estimate the standard deviation
-of the population. With \code{method = "left"}, the value returned is the
-position of the peak + \code{sd} times the standard deviation of the
+population is assumed to follow a normal distribution. This approach
+also can be specified directly by \code{method = "left"} as described
+below.
+
+With \code{method = "left"}, the maximum of the left most (minimum)
+population is determined from a kernel density estimate. If
+\code{half.range = TRUE}, the \emph{left} half of the population will be used to
+determine the Gaussian distribution in order to estimate the standard
+deviation of the population. With \code{method = "left"}, the value returned
+is the position of the peak + \code{sd} times the standard deviation of the
 distribution.
 
 A diagnostic plot will be generated with base graphics if \code{plot = TRUE}.
-If a plot is produced, the arguments \code{legend = TRUE} (default) will add
+In this case, the default argument \code{legend = TRUE} will add
 an informative legend to the plot showing the data and breakpoint. The
 plotting option can be useful to iteratively adjust the search parameters
-such as \code{adjust}, which is handed to the kernel density function,
-of \code{sd}, \code{from} and \code{to}.
+such as \code{adjust}, \code{from}, \code{to} and \code{sd}.
 }
 \examples{
+# Read and clean up synchronized cell data
+  fs <- readSet(system.file("extdata", "synch", package = "flowExtra"))
+  fs <- Subset(fs, linearGate(fs, "FL2.A", "FL2.H"))
+# breakpoint by default (method = "minimum")
+  rangeGate2(fs[[8]], "FL2.A", plot = TRUE)
+# breakpoint by left population (method = "left")
+  rangeGate2(fs[[8]], "FL2.A", method = "left", plot = TRUE)
+# puzzling choice with original rangeGate() function
+  flowStats::rangeGate(fs[[8]], "FL2.A", plot = TRUE)
+# example of multiple possible breakpoints
+  rangeGate2(fs[[2]], "FL2.A", plot = TRUE)
+# adjust by limiting search range with 'to'
+  rangeGate2(fs[[2]], "FL2.A", plot = TRUE, to = 275)
 
 }
 \seealso{
