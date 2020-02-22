@@ -7,7 +7,7 @@
 #' @param spar smoothing parameter for \code{smooth.spline} between 0 and 1
 #' 
 #' @return
-#' An \code{invisible} list identifying each extreme value found in the smoothed
+#' A list identifying each extreme value found in the smoothed
 #' curve. The components of the list include \code{x} and \code{y} for the
 #' x- and y-values, \code{sign} which is +1 for a maximum and -1 for a minimum,
 #' and the smoothing model returned by \code{smooth.spline()} in \code{model}.
@@ -41,7 +41,9 @@
 #'   abline(v = ans$x, col = ifelse(ans$sign > 0, "black", NA))
 #' 
 #'   print(zero.cross(1:10, 1:10))
-#' 
+#'
+#' @export
+#'
 zero.cross <- function(x, y, first = FALSE, spar = NULL) {
 	keep <- complete.cases(x, y)	# smooth.spline can't handle missing data
 	x <- x[keep]
@@ -70,5 +72,5 @@ zero.cross <- function(x, y, first = FALSE, spar = NULL) {
 	xx <- x[zc.index]
 	yy <- y[zc.index]
 	sign <- sign1[zc.index]
-	invisible(list(x=xx, y=yy, sign=sign, model=fms))
+	list(x = xx, y = yy, sign = sign, model = fms)
 }

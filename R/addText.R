@@ -1,7 +1,7 @@
 #' Add text to an existing lattice plot
 #'
 #' This serves the same role as the base function [graphics::text()] for
-#' use in `lattice` plots. 
+#' use in `lattice` plots.  (Also can be called as `text2()`.)
 #'
 #' @md
 #' @param x,y Numeric vectors of coordinates where text `labels` should
@@ -25,6 +25,9 @@
 #' 
 #' @import
 #' lattice
+#'
+#' @name addText
+#' @aliases text2
 #'
 #' @examples
 #'
@@ -72,3 +75,6 @@ addText <- function(x, y, labels, col = "red", cex = 2/3, adj = 0.5, ...) {
 		trellis.unfocus()
 	}
 }
+
+# alias
+text2 <- addText

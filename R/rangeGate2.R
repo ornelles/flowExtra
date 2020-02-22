@@ -45,21 +45,23 @@
 #' `to`. If more than four high density regions exist *or* if only a
 #' single high density region is detected, the breakpoint will be
 #' determined from the properties of the leftmost population where this
-#' population is assumed to follows a normal distribution. This approach
-#' also can be specified directly by `method = "left"`. The maximum of
-#' this population is determined from a kernel density estimate. If
-#' `half.range = TRUE`, the *left* half of the population will be fit to
-#' the presumed Gaussian distribution to estimate the standard deviation
-#' of the population. With `method = "left"`, the value returned is the
-#' position of the peak + `sd` times the standard deviation of the
+#' population is assumed to follow a normal distribution. This approach
+#' also can be specified directly by `method = "left"` as described
+#' below.
+#'
+#' With `method = "left"`, the maximum of the left most (minimum)
+#' population is determined from a kernel density estimate. If
+#' `half.range = TRUE`, the *left* half of the population will be used to
+#' determine the Gaussian distribution in order to estimate the standard
+#' deviation of the population. With `method = "left"`, the value returned
+#' is the position of the peak + `sd` times the standard deviation of the
 #' distribution.
 #' 
 #' A diagnostic plot will be generated with base graphics if `plot = TRUE`.
-#' If a plot is produced, the arguments `legend = TRUE` (default) will add
+#' In this case, the default argument `legend = TRUE` will add
 #' an informative legend to the plot showing the data and breakpoint. The
 #' plotting option can be useful to iteratively adjust the search parameters
-#' such as `adjust`, which is handed to the kernel density function,
-#' of `sd`, `from` and `to`.  
+#' such as `adjust`, `from`, `to` and `sd`. 
 #'
 #' @seealso [flowStats::rangeGate()]
 #'
@@ -72,6 +74,19 @@
 #' @importFrom MASS fitdistr
 #' 
 #' @examples
+#' # Read and clean up synchronized cell data
+#'   fs <- readSet(system.file("extdata", "synch", package = "flowExtra"))
+#'   fs <- Subset(fs, linearGate(fs, "FL2.A", "FL2.H"))
+#' # breakpoint by default (method = "minimum")
+#'   rangeGate2(fs[[8]], "FL2.A", plot = TRUE)
+#' # breakpoint by left population (method = "left")
+#'   rangeGate2(fs[[8]], "FL2.A", method = "left", plot = TRUE)
+#' # puzzling choice with original rangeGate() function
+#'   flowStats::rangeGate(fs[[8]], "FL2.A", plot = TRUE)
+#' # example of multiple possible breakpoints
+#'   rangeGate2(fs[[2]], "FL2.A", plot = TRUE)
+#' # adjust by limiting search range with 'to'
+#'   rangeGate2(fs[[2]], "FL2.A", plot = TRUE, to = 275)
 #'
 #' @export
 #' 
@@ -147,6 +162,8 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 		}
 		else
 			xx <- x
+		if (!length(xx))
+			stop("unable to determine left-most peak")
 		fit <- MASS::fitdistr(xx, "normal")
 		loc <- fit$est[1] + sd * fit$est[2]
 	}
@@ -163,7 +180,7 @@ rangeGate2 <- function(fs, stain, from = NULL, to = NULL, cutoff = 0.05,
 	# assemble legend components
 		leg.txt <- c(sprintf("breakpoint (%0.4g)", loc),
 			ifelse(length(xp) > 1, "peaks", "peak"), "gated region",
-			"analyzed region")
+			"search region")
 		if (method == "left" | length(xp) > 4 | length(xp) == 1)
 			leg.title <- paste('"Left" method, sd =', round(sd, 1))
 		else
