@@ -75,6 +75,6 @@ named, the first column will be analyzed.
 \examples{
  fs <- readSet(system.file("extdata", "synch/", package = "flowExtra"))
  peakFind(fs) # find all by default
- peakFind(fs, range.search = c(50, 500)) # find probable G1 and G2
+ peakFind(fs[9:16]) # paired peaks are labeled "G1" and "G2"
 
 }

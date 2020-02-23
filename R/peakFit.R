@@ -19,7 +19,8 @@ peakFit <- function(x) {
 #' @name mgfun
 #' @rdname peakFit
 #'
-#' @title mgfun
+#' @title
+#' Multiple Gaussian density distribution
 #'
 #' @description
 #' Density distribution function for multiple Gaussian function of 
@@ -37,6 +38,8 @@ peakFit <- function(x) {
 #'   relative **area** of each peak.
 #'
 #' @return The combined Gaussian density for given `x` values and parameters
+#'
+#' @export
 #'
 mgfun <- function(x, mean, sd = 0.05 * mean, lambda = 1/length(mean))
 {
@@ -60,10 +63,10 @@ mgfun <- function(x, mean, sd = 0.05 * mean, lambda = 1/length(mean))
 #' @rdname peakFit
 #'
 #' @title
-#' Density distribution function for a single Gaussian.
+#' Gaussian density distribution
 #'
 #' @description
-#' This is a simpler version of [stats::dnorm()] and runs a little faster.
+#' This is a simpler version of [stats::dnorm] and runs a little faster.
 #'
 #' @param x Numeric values at which to evaluate the function
 #' @param mean Mean value for the Gaussian distribution
@@ -72,6 +75,8 @@ mgfun <- function(x, mean, sd = 0.05 * mean, lambda = 1/length(mean))
 #'
 #' @return The Gaussian density for given `x` values
 #'
+#' @export
+#'
 gfun <- function(x, mean, sd) {
-	1/(sd * sqrt(2 * pi))*exp(-0.5 * ((x - meam)/sd)^2)
+	1/(sd * sqrt(2 * pi))*exp(-0.5 * ((x - mean)/sd)^2)
 }

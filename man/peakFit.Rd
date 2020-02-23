@@ -40,7 +40,7 @@ Density distribution function for multiple Gaussian function of
 given means (`mean`) and standard deviations (`sd`), each adjusted  by
 the multiplier `lambda` where `sum(lambda) = 1`.
 
-This is a simpler version of [stats::dnorm()] and runs a little faster.
+This is a simpler version of [stats::dnorm] and runs a little faster.
 }
 \details{
 Currently a stub for the \code{peakFit} function.
